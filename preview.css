@@ -1,0 +1,705 @@
+/* Font stack and base elements */
+
+:root {
+  --typeface:
+    "IBM Plex Mono",
+    Consolas,
+    "Cascadia Mono",
+    "Liberation Mono",
+    "Courier New",
+    monospace;
+  font-family: var(--typeface);
+  color: #2c3932;
+  background: #f5f3ed;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button,
+select {
+  cursor: pointer;
+}
+
+button,
+a,
+input,
+select {
+  min-height: 40px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #52794d;
+  outline-offset: 3px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Preview header, branding, and device tabs */
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 36px;
+  border-bottom: 1px solid #dcded3;
+  background: #eeeee5;
+}
+
+.preview-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-size: 19px;
+  letter-spacing: -.6px;
+  font-weight: 750;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  background: #e7c963;
+  width: 36px;
+  height: 38px;
+  border-radius: 4px 4px 12px 4px;
+  font: italic 31px var(--typeface);
+  box-shadow: 2px 2px 0 #d6b852;
+}
+
+.preview-brand small {
+  display: block;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 1.8px;
+  margin-top: 4px;
+  color: #6c726a;
+}
+
+.device-tabs {
+  display: flex;
+  gap: 4px;
+  background: #e2e5d9;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.device-tabs button {
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  padding: 8px 19px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.device-tabs button span {
+  font-size: 20px;
+}
+
+.device-tabs button[aria-pressed=true] {
+  background: #fffef9;
+  box-shadow: 0 2px 4px #35433312;
+}
+
+.unframed-link {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: #59634f;
+  text-underline-offset: 4px;
+}
+
+/* Page heading and screen controls */
+
+main {
+  max-width: 1800px;
+  padding: 30px 42px 0;
+  margin: auto;
+}
+
+.studio-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 23px;
+}
+
+h1 {
+  font: 32px/1.2 var(--typeface);
+  letter-spacing: -.8px;
+  margin: 0;
+}
+
+h1 em {
+  color: #768366;
+  font-weight: 400;
+}
+
+.preview-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  border: 1px solid #dcded3;
+  border-radius: 7px;
+  background: #eeeee57a;
+  padding: 11px 15px;
+  margin-bottom: 20px;
+}
+
+.preview-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: #687060;
+}
+
+.preview-controls select,
+.preview-controls input {
+  background: #fffef9;
+  border: 1px solid #d8ddce;
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 6px 9px;
+  min-height: 34px;
+}
+
+.preview-controls input {
+  width: 76px;
+}
+
+.preview-controls select {
+  max-width: 240px;
+}
+
+.zoom-control {
+  margin-left: auto;
+}
+
+#screenReadout {
+  font-size: 10px;
+  color: #6c726a;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Preview stage and shared device frame */
+
+.preview-stage {
+  height: clamp(450px,calc(100dvh - 350px),1100px);
+  min-width: 0;
+  background-color: #e8eadf;
+  background-image: radial-gradient(#9ba88c42 .7px,transparent .7px);
+  background-size: 14px 14px;
+  border: 1px solid #d9dfcd;
+  border-radius: 10px;
+  overflow: auto;
+  padding: 25px 35px;
+  position: relative;
+  overscroll-behavior: contain;
+}
+
+.device-space {
+  position: relative;
+  margin: 0 auto;
+}
+
+.device-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  background: #282d2b;
+  box-shadow: 0 20px 45px -18px #24372a80;
+  isolation: isolate;
+}
+
+.device-frame iframe {
+  border: 0;
+  display: block;
+  background: #f5f3ed;
+  position: absolute;
+}
+
+.device-camera {
+  position: absolute;
+  border-radius: 50%;
+  background: #101715;
+  box-shadow: inset 0 0 0 2px #454c49;
+  z-index: 2;
+}
+
+/* Laptop frame */
+
+.laptop {
+  border-radius: 16px 16px 7px 7px;
+  border: 2px solid #666e68;
+  background: #282e2b;
+}
+
+.laptop .device-camera {
+  width: 8px;
+  height: 8px;
+  top: 9px;
+  left: calc(50% - 4px);
+}
+
+.device-chin {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: #b5bdb5;
+  line-height: 20px;
+}
+
+.laptop-base {
+  position: absolute;
+  height: 23px;
+  left: -4%;
+  width: 108%;
+  bottom: -21px;
+  background: linear-gradient(#cdd3cc,#8e978e 75%,#687168);
+  border-radius: 2px 2px 35% 35%;
+  box-shadow: 0 13px 18px -7px #33432a55;
+}
+
+.laptop-base span {
+  display: block;
+  margin: auto;
+  width: 16%;
+  height: 8px;
+  border-radius: 0 0 8px 8px;
+  background: #808b80;
+}
+
+/* Phone frame and decorative controls */
+
+.phone {
+  border-radius: 48px;
+  border: 3px solid #9c9aa4;
+  background: #141616;
+  box-shadow: inset 0 0 0 2px #3f4344, 0 22px 40px -15px #24372a70;
+}
+
+.phone iframe {
+  border-radius: 0 0 29px 29px;
+}
+
+.phone .device-camera {
+  width: 12px;
+  height: 12px;
+  top: 19px;
+  left: calc(50% - 6px);
+  background: #06090c;
+  box-shadow: 0 0 0 2px #2b3036;
+}
+
+.phone-status {
+  display: none;
+  position: absolute;
+  top: 12px;
+  left: 27px;
+  right: 27px;
+  color: #eceee6;
+  font-size: 12px;
+  font-weight: 600;
+  justify-content: space-between;
+  height: 25px;
+  align-items: center;
+  letter-spacing: 1px;
+}
+
+.phone .phone-status {
+  display: flex;
+}
+
+.phone-gesture {
+  display: none;
+  position: absolute;
+  bottom: 10px;
+  left: calc(50% - 55px);
+  width: 110px;
+  height: 4px;
+  border-radius: 4px;
+  background: #d1d4cd;
+}
+
+.phone .phone-gesture {
+  display: block;
+}
+
+.phone-keys {
+  display: none;
+  position: absolute;
+  right: -6px;
+  top: 130px;
+  height: 95px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #86838f;
+}
+
+.phone-keys:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 130px;
+  height: 55px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #86838f;
+}
+
+.phone .phone-keys {
+  display: block;
+}
+
+.phone .device-chin,
+.phone .laptop-base {
+  display: none;
+}
+
+/* Monitor frame and stand */
+
+.monitor {
+  border: 2px solid #687167;
+  border-radius: 10px;
+  background: #2b322d;
+}
+
+.monitor .device-camera {
+  display: none;
+}
+
+.monitor .laptop-base {
+  display: none;
+}
+
+.monitor-stand {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: calc(50% - 45px);
+  height: 80px;
+  width: 90px;
+  background: linear-gradient(90deg,#747f75,#a8b2a7,#747f75);
+  clip-path: polygon(20% 0,80% 0,85% 85%,100% 94%,100% 100%,0 100%,0 94%,15% 85%);
+}
+
+.monitor .monitor-stand {
+  display: block;
+}
+
+/* Base responsive layouts and reduced motion */
+
+@media (max-width: 950px) {
+  .preview-header {
+    padding: 16px 20px;
+  }
+
+  main {
+    padding: 25px 22px 0;
+  }
+
+  .device-tabs button {
+    padding: 6px 12px;
+  }
+
+  .preview-controls {
+    gap: 10px;
+  }
+
+  .zoom-control {
+    margin-left: 0;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .preview-stage {
+    padding: 20px;
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 620px) {
+  .preview-header {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .preview-brand {
+    font-size: 17px;
+  }
+
+  .device-tabs {
+    order: 3;
+    width: 100%;
+  }
+
+  .device-tabs button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .unframed-link {
+    font-size: 10px;
+    margin-left: auto;
+  }
+
+  .studio-heading {
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-size: 27px;
+  }
+
+  h1 em {
+    display: block;
+  }
+
+  main {
+    padding: 23px 14px 0;
+  }
+
+  .preview-controls {
+    padding: 11px;
+    gap: 10px;
+  }
+
+  .preview-controls > label:first-child {
+    flex-basis: 100%;
+    justify-content: space-between;
+  }
+
+  .preview-controls select {
+    max-width: 235px;
+  }
+
+  .zoom-control {
+    flex: 1;
+  }
+
+  .zoom-control select {
+    max-width: 160px;
+  }
+
+  .preview-stage {
+    padding: 18px 12px;
+    height: 540px;
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Match the class prototype without altering device sizing. */
+
+/* Wallpaper theme: page and header */
+
+:root {
+  background: #0a1028;
+  color: #efedf5;
+  font-family: var(--typeface);
+}
+
+body {
+  min-height: 100vh;
+  background: #0a1028 url("Wallpaper.jpg") center center/cover fixed no-repeat;
+}
+
+.preview-header {
+  background: #0b1029e8;
+  border-color: #ffffff30;
+}
+
+.preview-brand {
+  letter-spacing: 0;
+}
+
+.brand-mark {
+  border-radius: 2px;
+  transform: rotate(-5deg);
+  box-shadow: 2px 3px #0008;
+}
+
+.preview-brand small {
+  color: #c4b9d1;
+}
+
+.device-tabs {
+  border-radius: 2px;
+  background: #ffffff15;
+}
+
+.device-tabs button {
+  color: #eee5f4;
+  border-radius: 2px;
+}
+
+.device-tabs button[aria-pressed=true] {
+  background: #a93b24;
+  color: #fff;
+  box-shadow: 2px 2px #080b2077;
+}
+
+.unframed-link {
+  color: #ffd19d;
+}
+
+/* Wallpaper theme: heading and screen controls */
+
+.studio-heading {
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: var(--typeface);
+  font-size: 28px;
+  color: #fff2d6;
+  letter-spacing: 0;
+  text-shadow: 2px 3px #080b20;
+}
+
+.preview-controls {
+  background: #0b1029e6;
+  border-color: #ffffff40;
+  border-radius: 2px;
+}
+
+.preview-controls label,
+#screenReadout {
+  color: #e3d9ed;
+}
+
+.preview-controls input,
+.preview-controls select {
+  background: #191d35;
+  color: #f5eff8;
+  border-color: #71667d;
+  border-radius: 2px;
+}
+
+.preview-stage {
+  background: transparent;
+  border-color: #ffffff35;
+  border-radius: 2px;
+}
+
+/* Monospace typography */
+
+.brand-mark {
+  font-style: normal;
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+.note-title,
+.preview-brand,
+.brand {
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+kbd {
+  font-family: var(--typeface);
+}
+
+/* Device labels and small-screen tabs */
+
+.screen-label {
+  font-size: 11px;
+  color: #e3d9ed;
+}
+
+.preview-controls {
+  justify-content: space-between;
+}
+
+@media (max-width: 620px) {
+  .device-tabs button {
+    font-size: 10px;
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .device-tabs button span {
+    font-size: 16px;
+  }
+
+  .screen-label {
+    flex-basis: 100%;
+  }
+}
+
+/* Let the device preview use the remaining window height. */
+
+/* Preview stage fills the remaining window height */
+
+body {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-header,
+.studio-heading,
+.preview-controls {
+  flex-shrink: 0;
+}
+
+main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 14px;
+}
+
+.preview-stage {
+  flex: 1;
+  height: auto;
+  min-height: 120px;
+}

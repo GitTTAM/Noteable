@@ -1,0 +1,249 @@
+/*
+ * reminder-picker.css
+ * Reminder date and time fields, calendar, and time popup.
+ */
+
+/* Reminder field layout */
+
+.reminder-field {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 12px;
+}
+
+.reminder-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* Date, time, and clear buttons */
+
+.reminder-picker > button {
+  min-height: 42px;
+  padding: 8px 10px;
+  background: #191d35;
+  color: #f5eff8;
+  border: 1px solid #8a7b94;
+  border-radius: 2px;
+  font-family: var(--typeface);
+  font-size: 11px;
+}
+
+.reminder-picker > button:hover {
+  border-color: #f0b367;
+}
+
+.reminder-picker .clear-reminder {
+  font-size: 18px;
+  padding: 5px 10px;
+}
+
+/* Shared popup surface and buttons */
+
+.reminder-popup {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: 298px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 16px);
+  overflow: auto;
+  padding: 12px;
+  background: #30333a;
+  color: #f5f0e7;
+  border: 1px solid #8e828d;
+  border-radius: 3px;
+  box-shadow: 3px 5px 15px #0007;
+  font-family: var(--typeface);
+  font-size: 12px;
+}
+
+.reminder-popup::backdrop {
+  background: transparent;
+}
+
+.reminder-popup button {
+  font-family: var(--typeface);
+  background: transparent;
+  color: inherit;
+  border: 0;
+  border-radius: 2px;
+  min-height: 35px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.reminder-popup button:hover {
+  background: #ffffff20;
+}
+
+/* Calendar heading and month controls */
+
+.picker-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.picker-heading strong {
+  font-size: 12px;
+}
+
+.picker-heading button {
+  font-size: 23px;
+  width: 34px;
+}
+
+/* Calendar weekdays, dates, and selected states */
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7,minmax(0,1fr));
+  gap: 2px;
+}
+
+.calendar-days .weekday {
+  text-align: center;
+  padding: 5px 0 8px;
+  font-size: 10px;
+  color: #d4cfda;
+}
+
+.calendar-days button {
+  padding: 0;
+  font-size: 11px;
+  min-height: 33px;
+}
+
+.calendar-days .other-month {
+  color: #b2a9b4;
+}
+
+.calendar-days button[aria-current=date] {
+  outline: 1px solid #ffca83;
+  outline-offset: -3px;
+}
+
+.calendar-days button.selected {
+  background: #a93b24;
+  color: #fff;
+}
+
+/* Popup footer actions */
+
+.picker-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #ffffff30;
+  margin-top: 10px;
+  padding-top: 7px;
+}
+
+.picker-footer button {
+  padding: 5px 10px;
+  color: #ffd09b;
+}
+
+/* Time picker fields */
+
+.time-heading {
+  display: block;
+  font-size: 12px;
+  margin: 5px 0 16px;
+}
+
+.time-selects {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.time-selects label {
+  display: grid;
+  gap: 8px;
+  font-size: 10px;
+  color: #e2d9e9;
+}
+
+.time-selects select {
+  background: #191d35;
+  color: #fff;
+  border: 1px solid #92839c;
+  border-radius: 2px;
+  font-family: var(--typeface);
+  font-size: 14px;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px;
+  max-width: none;
+}
+
+/* Reminder controls inside the note editor */
+
+dialog .reminder-picker > button {
+  background: #fffaf0;
+  color: #292a31;
+  border-color: #b6b0aa;
+}
+
+.form-label .reminder-picker {
+  gap: 5px;
+}
+
+.form-label .reminder-picker > button {
+  font-size: 10px;
+  padding: 7px;
+}
+
+/* Keyboard focus */
+
+.reminder-popup button:focus-visible,
+.time-selects select:focus-visible {
+  outline: 2px solid #ffc97f;
+  outline-offset: -2px;
+}
+
+.reminder-popup button:focus-visible {
+  background: #ffffff15;
+}
+
+/* Small-screen layout */
+
+@media (max-width: 620px) {
+  .reminder-field {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .calendar-days button {
+    min-height: 36px;
+  }
+}
+
+/* Full-field date and time triggers */
+
+.reminder-picker > button:not(.clear-reminder) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.picker-value {
+  flex: 1;
+}
+
+.picker-icon {
+  font-size: 15px;
+  pointer-events: none;
+}

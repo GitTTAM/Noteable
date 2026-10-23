@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a1028" />
+    <meta name="description" content="Noteable class project. Browser-only notes." />
+    <title>Noteable</title>
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="reminder-picker.css" />
+    <script src="reminder-picker.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <!-- Sidebar and navigation -->
+    <aside class="sidebar">
+      <a class="brand" href="#capture" aria-label="Noteable home">
+        <span class="brand-mark" aria-hidden="true">n.</span>
+        <span>
+          Noteable
+          <small class="brand-credit">Made by KBM</small>
+        </span>
+      </a>
+      <nav aria-label="Workspace">
+        <p class="nav-label">WORKSPACE</p>
+        <button class="nav-item selected" id="captureNav" type="button">
+          <span aria-hidden="true">＋</span>
+          Quick capture
+          <span class="nav-key">N</span>
+        </button>
+        <button class="nav-item" id="reviewNav" type="button">
+          <span aria-hidden="true">▤</span>
+          My notebook
+          <span class="nav-count" id="noteCount">0</span>
+        </button>
+        <button class="nav-item" id="remindersNav" type="button">
+          <span aria-hidden="true">◷</span>
+          Reminders
+          <span class="nav-count" id="reminderCount">0</span>
+        </button>
+        <div class="nav-heading">
+          <p class="nav-label">COLLECTIONS</p>
+          <span aria-hidden="true">↳</span>
+        </div>
+        <div id="collectionNav"></div>
+      </nav>
+      <div class="sidebar-bottom">
+        <p>Saved in this browser</p>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <!-- Workspace header -->
+      <header class="topbar">
+        <span id="breadcrumb">
+          Workspace
+          <span aria-hidden="true">/</span>
+          Quick capture
+        </span>
+        <a class="device-view-link" href="preview.html">Device views ↗</a>
+        <span class="prototype-tag">
+          CLASS PROTOTYPE
+          <span class="status-dot"></span>
+        </span>
+      </header>
+      <main>
+        <!-- Quick capture -->
+        <section id="captureView" aria-labelledby="captureHeading">
+          <div class="page-heading"><h1 id="captureHeading">Quick note</h1></div>
+          <div class="capture-layout">
+            <div>
+              <div class="pad-toolbar">
+                <div
+                  id="captureColors"
+                  class="swatches"
+                  role="group"
+                  aria-label="Note color"
+                ></div>
+                <label class="template-picker">
+                  Start from
+                  <select id="templateSelect" aria-label="Start from a template">
+                    <option value="">Blank note</option>
+                  </select>
+                </label>
+              </div>
+              <article class="capture-pad" id="capturePad">
+                <div class="pad-topline">
+                  <span class="paper-label">NEW NOTE</span>
+                  <span id="draftStatus" class="paper-label" role="status">
+                    Empty draft
+                  </span>
+                </div>
+                <label class="sr-only" for="draftTitle">Note title, optional</label>
+                <input
+                  class="note-title"
+                  id="draftTitle"
+                  placeholder="Note title (optional)"
+                  maxlength="160"
+                  autocomplete="off"
+                />
+                <div id="captureFields"></div>
+                <button class="add-field" id="addCaptureField" type="button">
+                  ＋ New field
+                </button>
+              </article>
+              <div class="capture-actions">
+                <button
+                  class="text-button"
+                  id="captureOptionsButton"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="captureOptions"
+                >
+                  ◷ Add a reminder
+                </button>
+                <div class="save-action">
+                  <kbd>Ctrl ↵</kbd>
+                  <button class="primary" id="saveCapture" type="button">
+                    Tear off & save
+                    <span aria-hidden="true">↗</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Optional reminder fields -->
+              <div class="capture-options" id="captureOptions" hidden>
+                <div class="reminder-field">
+                  <span>Remind me</span>
+                  <input
+                    type="datetime-local"
+                    id="draftReminder"
+                    aria-label="Capture reminder"
+                  />
+                </div>
+                <p>
+                  Shows an alert here while this app is open. Past-due alerts appear when
+                  you return.
+                </p>
+              </div>
+            </div>
+            <!-- Recent notes -->
+            <aside class="recent-panel" aria-labelledby="recentHeading">
+              <div class="section-heading">
+                <h2 id="recentHeading">ON YOUR STACK</h2>
+                <span id="recentCount">00</span>
+              </div>
+              <div id="recentNotes"></div>
+              <button class="text-button notebook-link" id="viewAllButton" type="button">
+                Open my notebook
+                <span aria-hidden="true">↗</span>
+              </button>
+            </aside>
+          </div>
+        </section>
+
+        <!-- Notebook, filters, and empty state -->
+        <section id="reviewView" aria-labelledby="reviewHeading" hidden>
+          <div class="page-heading review-heading">
+            <div><h1 id="reviewHeading">My notebook</h1></div>
+            <button class="primary" id="newNoteButton" type="button">＋ New note</button>
+          </div>
+          <div class="review-toolbar">
+            <label class="search-wrap">
+              <span aria-hidden="true">⌕</span>
+              <input
+                id="searchInput"
+                type="search"
+                aria-label="Search notes"
+                placeholder="Search notes…"
+              />
+            </label>
+            <label class="sr-only" for="collectionFilter">Collection</label>
+            <select id="collectionFilter">
+              <option value="">All collections</option>
+            </select>
+            <label class="check-filter">
+              <input id="pinnedFilter" type="checkbox" />
+              Pinned only
+            </label>
+            <button class="text-button" id="exportButton" type="button">
+              Export notes ↓
+            </button>
+          </div>
+          <div id="dueBanner" class="due-banner" role="status" hidden></div>
+          <div id="reviewBoard" class="review-board"></div>
+          <div id="reviewEmpty" class="empty-state" hidden>
+            <span aria-hidden="true">▱</span>
+            <h2>No notes</h2>
+            <p id="emptyMessage">Save a note to get started.</p>
+            <button class="secondary" id="emptyCaptureButton" type="button">
+              New note
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Note editor -->
+    <dialog id="noteDialog" aria-labelledby="editorHeading">
+      <div class="dialog-heading">
+        <div><h2 id="editorHeading">Edit your note</h2></div>
+        <button
+          class="icon-button"
+          id="closeEditor"
+          type="button"
+          aria-label="Close editor"
+        >
+          ×
+        </button>
+      </div>
+      <form id="editorForm">
+        <label class="form-label">
+          Title
+          <input id="editTitle" maxlength="160" placeholder="Note title (optional)" />
+        </label>
+        <div class="form-grid">
+          <label class="form-label">
+            Collection
+            <input
+              id="editCollection"
+              list="collectionOptions"
+              maxlength="40"
+              placeholder="Inbox"
+            />
+          </label>
+          <div class="form-label">
+            Reminder
+            <input type="datetime-local" id="editReminder" aria-label="Note reminder" />
+          </div>
+        </div>
+        <datalist id="collectionOptions"></datalist>
+        <div class="editor-controls">
+          <div
+            class="swatches"
+            id="editColors"
+            role="group"
+            aria-label="Edit note color"
+          ></div>
+          <label class="check-filter">
+            <input id="editPinned" type="checkbox" />
+            Pin this note
+          </label>
+        </div>
+        <div class="editor-paper" id="editPaper">
+          <div id="editFields"></div>
+          <button class="add-field" id="addEditField" type="button">＋ New field</button>
+        </div>
+        <p class="editor-meta" id="editorMeta"></p>
+        <div class="dialog-actions">
+          <button class="text-button danger" id="deleteNote" type="button">
+            Delete note
+          </button>
+          <button class="secondary" id="saveTemplate" type="button">
+            Save as template
+          </button>
+          <button class="primary" type="submit">Save changes ↗</button>
+        </div>
+      </form>
+    </dialog>
+    <!-- Status messages -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

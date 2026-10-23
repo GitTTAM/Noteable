@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a1028" />
+    <title>Noteable · Device views</title>
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="preview.css" />
+    <script src="preview.js" defer></script>
+  </head>
+  <body>
+    <!-- Branding and device selection -->
+    <header class="preview-header">
+      <a class="preview-brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">n.</span>
+        <span>
+          Noteable
+          <small class="brand-credit">Made by KBM</small>
+        </span>
+      </a>
+      <div class="device-tabs" role="group" aria-label="Preview device">
+        <button type="button" data-device="phone" aria-pressed="false">
+          <span aria-hidden="true">▯</span>
+          Phone
+        </button>
+        <button type="button" data-device="laptop" aria-pressed="true">
+          <span aria-hidden="true">▱</span>
+          14-inch laptop
+        </button>
+        <button type="button" data-device="monitor" aria-pressed="false">
+          <span aria-hidden="true">▣</span>
+          24-inch monitor
+        </button>
+      </div>
+      <a class="unframed-link" href="index.html">Use without frame ↗</a>
+    </header>
+    <main>
+      <section class="studio-heading" aria-labelledby="deviceHeading">
+        <h1 id="deviceHeading">Device preview</h1>
+      </section>
+      <!-- Screen label and preview scale -->
+      <section class="preview-controls" aria-label="Screen settings">
+        <span id="screenLabel" class="screen-label">14-inch laptop</span>
+        <label class="zoom-control">
+          Preview
+          <select id="zoomMode">
+            <option value="fit">Fit to window</option>
+            <option value="1">Actual size · 100%</option>
+            <option value="0.75">75%</option>
+            <option value="0.5">50%</option>
+          </select>
+        </label>
+        <output id="screenReadout" aria-live="polite">1440 × 900 CSS px</output>
+      </section>
+      <!-- Interactive app and device frame -->
+      <section
+        class="preview-stage"
+        id="previewStage"
+        aria-label="Interactive device preview"
+      >
+        <div class="device-space" id="deviceSpace">
+          <div class="device-frame laptop" id="deviceFrame">
+            <div class="device-camera" aria-hidden="true"></div>
+            <div class="phone-status" aria-hidden="true">
+              <span>9:41</span>
+              <span>▴ ▰ ▰</span>
+            </div>
+            <iframe
+              id="appPreview"
+              title="Noteable interactive 14-inch laptop preview"
+              src="index.html?embedded=1"
+            ></iframe>
+            <div class="phone-gesture" aria-hidden="true"></div>
+            <div class="device-chin" aria-hidden="true">NOTEABLE</div>
+            <div class="laptop-base" aria-hidden="true"><span></span></div>
+            <div class="monitor-stand" aria-hidden="true"></div>
+            <div class="phone-keys" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
