@@ -4,7 +4,11 @@ Made by KBM for our class project. It's a place to jot down notes, sketch someth
 
 ## Getting started
 
-Unzip the project if needed, then open preview.html in your browser. You can switch between the phone, 14-inch laptop, and 24-inch monitor views. Click Use without frame if you'd rather use the app on its own, or open index.html directly.
+[**Download Noteable (.zip)**](https://github.com/GitTTAM/Noteable/archive/refs/heads/main.zip)
+
+The ZIP includes all app files and fonts from the latest version on main. You can also use **Code > Download ZIP** on GitHub.
+
+Extract the ZIP, open the Noteable-main folder, then open preview.html in your browser. You can switch between the phone, 14-inch laptop, and 24-inch monitor views. Click Use without frame if you'd rather use the app on its own, or open index.html directly.
 
 Keep the files and fonts folder together. There's nothing to install, and you don't need an account, server, or .env file.
 
