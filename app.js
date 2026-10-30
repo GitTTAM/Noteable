@@ -12,20 +12,48 @@
     templates: 'stickyNotesPrototype.templates',
   };
   const COLORS = [
-    ['Sun', '#f5df87'],
-    ['Lilac', '#d9cfee'],
-    ['Blue', '#c8dce9'],
-    ['Rose', '#efc8c6'],
-    ['Sage', '#d7dfbe'],
-    ['Peach', '#f1d1ad'],
+    ['Black & Yellow', '#ffe600', '#111111', '#171717'],
+    ['Blue & Red', '#0455e8', '#ff3030', '#ffffff'],
+    ['Coral & Teal', '#00babe', '#ff947e', '#10282a'],
+    ['Purple & Pink', '#7313a3', '#ff948b', '#ffffff'],
+    ['Graphite & Lime', '#363636', '#c8ec00', '#ffffff'],
+    ['Black & Orange', '#ff9900', '#111111', '#171717'],
   ];
   const LEGACY_COLORS = [
+    '#f5df87',
+    '#d9cfee',
+    '#c8dce9',
+    '#efc8c6',
+    '#d7dfbe',
+    '#f1d1ad',
     '#ffe16a',
     '#a9dbe8',
     '#f5aabd',
     '#c7e59b',
     '#c8b2ec',
     '#ffc28f',
+  ];
+  const builtins = [
+    {
+      id: 'cornell',
+      name: 'Cornell notes',
+      labels: ['Cues', 'Notes', 'Summary'],
+      slots: ['cues', 'notes', 'summary'],
+      layout: 'cornell',
+      color: COLORS[0][1],
+    },
+    {
+      id: 'todo',
+      name: 'To-do list',
+      labels: ['To do', 'In progress', 'Done'],
+      color: COLORS[2][1],
+    },
+    {
+      id: 'class',
+      name: 'Class notes',
+      labels: ['Notes', 'Key concepts', 'Questions'],
+      color: COLORS[1][1],
+    },
   ];
   const $ = (id) => document.getElementById(id);
 
@@ -44,18 +72,26 @@
     COLORS.some((c) => c[1] === value) || LEGACY_COLORS.includes(value)
       ? value
       : COLORS[0][1];
-  const blankField = (label = 'Notes') => ({
+  const fieldSlot = (value) =>
+    ['cues', 'notes', 'summary'].includes(value) ? value : '';
+  const noteLayout = (value) => (value === 'cornell' ? 'cornell' : 'stacked');
+  const blankField = (label = 'Notes', slot = '') => ({
     id: makeId(),
     label,
     text: '',
     mode: 'text',
     strokes: [],
+    slot: fieldSlot(slot),
   });
-  const blankDraft = (color = COLORS[0][1]) => ({
+  const blankDraft = () => ({
     title: '',
-    color,
+    color: builtins[0].color,
     reminderAt: '',
-    fields: [blankField()],
+    templateId: 'cornell',
+    layout: 'cornell',
+    fields: builtins[0].labels.map((label, index) =>
+      blankField(label, builtins[0].slots[index]),
+    ),
   });
 
   // Browser storage and saved data
@@ -78,6 +114,9 @@
       return false;
     }
   }
+  function saveNoteLists(nextNotes, nextTrash = trash) {
+    return write(KEYS.notes, [...nextNotes, ...nextTrash]);
+  }
   function normalizeFields(raw, fallback = '') {
     if (!Array.isArray(raw) || !raw.length) return [{ ...blankField(), text: fallback }];
     return raw
@@ -87,6 +126,7 @@
         label: typeof f.label === 'string' ? f.label.slice(0, 60) : 'Notes',
         text: typeof f.text === 'string' ? f.text : '',
         mode: f.mode === 'draw' ? 'draw' : 'text',
+        slot: fieldSlot(f.slot),
         strokes: Array.isArray(f.strokes)
           ? f.strokes
               .filter(Array.isArray)
@@ -121,13 +161,19 @@
       updatedAt: validDate(raw.updatedAt) ? raw.updatedAt : now,
       reminderAt: validDate(raw.reminderAt) ? raw.reminderAt : '',
       reminderDismissed: Boolean(raw.reminderDismissed),
+      deletedAt: validDate(raw.deletedAt) ? raw.deletedAt : '',
+      layout: noteLayout(raw.layout),
       sortPosition: Number.isFinite(raw.sortPosition) ? raw.sortPosition : index,
     };
   }
 
   // Restore notes and the unfinished draft
   const saved = read(KEYS.notes, []);
-  let notes = Array.isArray(saved) ? saved.map(normalizeNote).filter(Boolean) : [];
+  const loadedNotes = Array.isArray(saved)
+    ? saved.map(normalizeNote).filter(Boolean)
+    : [];
+  let notes = loadedNotes.filter((note) => !note.deletedAt);
+  let trash = loadedNotes.filter((note) => note.deletedAt);
   let draft = blankDraft();
   const storedDraft = read(KEYS.draft, null);
   if (storedDraft && typeof storedDraft === 'object') {
@@ -136,27 +182,26 @@
       title: typeof storedDraft.title === 'string' ? storedDraft.title : '',
       color: colorValue(storedDraft.color),
       reminderAt: validDate(storedDraft.reminderAt) ? storedDraft.reminderAt : '',
+      templateId:
+        typeof storedDraft.templateId === 'string' ? storedDraft.templateId : '',
+      layout: noteLayout(storedDraft.layout),
       fields: normalizeFields(storedDraft.fields),
     };
     if (!draft.fields.length) draft.fields = [blankField()];
   } else {
     try {
-      draft.fields[0].text = localStorage.getItem(KEYS.legacyDraft) || '';
+      const legacyText = localStorage.getItem(KEYS.legacyDraft) || '';
+      if (legacyText) {
+        draft.fields = [{ ...blankField(), text: legacyText }];
+        draft.layout = 'stacked';
+        draft.templateId = '';
+      }
     } catch {
       storageWarning = true;
     }
   }
 
   // Built-in and saved templates
-  const builtins = [
-    { id: 'class', name: 'Class notes', labels: ['Notes', 'Key concepts', 'Questions'] },
-    {
-      id: 'meeting',
-      name: 'Meeting notes',
-      labels: ['Notes', 'Decisions', 'Action items'],
-    },
-    { id: 'idea', name: 'An idea', labels: ['Idea', 'Next steps'] },
-  ];
   const savedTemplates = read(KEYS.templates, []);
   let templates = Array.isArray(savedTemplates)
     ? savedTemplates.filter(
@@ -176,6 +221,28 @@
   const announcedReminders = new Set();
   const hasContent = (note) =>
     note.fields.some((f) => f.text.trim() || f.strokes.some((s) => s.length));
+  // Give an old empty capture the new default without replacing unfinished work.
+  if (
+    !draft.templateId &&
+    !hasContent(draft) &&
+    !draft.title.trim() &&
+    !draft.reminderAt &&
+    ((draft.fields.length === 1 && draft.fields[0].label === 'Notes') ||
+      (draft.layout === 'cornell' &&
+        draft.fields.length === 3 &&
+        builtins[0].labels.every((label, index) => label === draft.fields[index].label)))
+  ) {
+    draft = blankDraft();
+  }
+  if (!draft.templateId) {
+    const matchingTemplate = [...builtins, ...templates].find(
+      (template) =>
+        noteLayout(template.layout) === draft.layout &&
+        template.labels.length === draft.fields.length &&
+        template.labels.every((label, index) => label === draft.fields[index].label),
+    );
+    draft.templateId = matchingTemplate?.id || '';
+  }
   const titleOf = (note) =>
     note.title.trim() ||
     note.fields
@@ -209,7 +276,6 @@
     Date.parse(note.reminderAt) <= Date.now();
   const pending = (note) => note.reminderAt && !note.reminderDismissed;
 
-
   // DOM helpers and messages
   function node(tag, className, text) {
     const el = document.createElement(tag);
@@ -223,11 +289,15 @@
     el.addEventListener('click', action);
     return el;
   }
-  function toast(message) {
+  function toast(message, action) {
     clearTimeout(toastTimer);
-    $('toast').textContent = message;
+    $('toast').replaceChildren(node('span', '', message));
+    if (action) $('toast').append(button(action.label, 'toast-action', action.run));
     $('toast').classList.add('visible');
-    toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 4800);
+    toastTimer = setTimeout(
+      () => $('toast').classList.remove('visible'),
+      action ? 10000 : 4800,
+    );
   }
 
   // Draft persistence and capture screen
@@ -239,24 +309,41 @@
         : 'Empty draft'
       : 'Draft not saved — storage unavailable';
     $('saveCapture').disabled = !hasContent(draft);
+    updateReminderButton();
+  }
+  function updateReminderButton() {
+    $('captureOptionsButton').textContent = draft.reminderAt
+      ? '◷ Edit reminder'
+      : '◷ Add a reminder';
+    $('captureOptionsButton').classList.toggle('has-reminder', Boolean(draft.reminderAt));
+    if (draft.reminderAt)
+      $('captureOptionsButton').title = reminderLabel(draft.reminderAt);
+    else $('captureOptionsButton').removeAttribute('title');
   }
   function paintColors(container, model, changed) {
     container.replaceChildren();
     const choices = COLORS.some((c) => c[1] === model.color)
       ? COLORS
-      : [...COLORS, ['Original', model.color]];
-    choices.forEach(([name, color]) => {
+      : [...COLORS, ['Original', model.color, '#554a36']];
+    choices.forEach(([name, color, accent]) => {
       const el = button('', 'swatch', () => {
         model.color = color;
         paintColors(container, model, changed);
         changed();
       });
       el.style.setProperty('--swatch', color);
+      el.style.setProperty('--swatch-accent', accent);
       el.setAttribute('aria-label', `${name} note color`);
       el.title = name;
       el.setAttribute('aria-pressed', String(model.color === color));
       container.append(el);
     });
+  }
+  function paintNote(element, color) {
+    const theme = COLORS.find((choice) => choice[1] === color);
+    element.style.setProperty('--note', color);
+    element.style.setProperty('--note-accent', theme?.[2] || '#554a36');
+    element.style.setProperty('--note-ink', theme?.[3] || '#292a31');
   }
   function renderCapture() {
     $('draftTitle').value = draft.title;
@@ -267,9 +354,9 @@
       'aria-expanded',
       String(Boolean(draft.reminderAt)),
     );
-    $('capturePad').style.setProperty('--note', draft.color);
+    paintNote($('capturePad'), draft.color);
     paintColors($('captureColors'), draft, () => {
-      $('capturePad').style.setProperty('--note', draft.color);
+      paintNote($('capturePad'), draft.color);
       persistDraft();
     });
     renderFields($('captureFields'), draft, persistDraft);
@@ -277,15 +364,25 @@
     $('draftStatus').textContent = hasContent(draft)
       ? 'Draft restored on this device'
       : 'Empty draft';
+    updateReminderButton();
   }
 
   // Text fields and drawing tools
   function renderFields(container, model, changed) {
     container.replaceChildren();
+    container.classList.add('note-fields');
+    container.dataset.layout = noteLayout(model.layout);
+    renderFieldSuggestions();
     model.fields.forEach((field, index) => {
       const section = node('section', 'note-field');
+      section.dataset.slot = field.slot || 'extra';
       const head = node('div', 'field-head');
+      const nameLabel = node('label', 'field-name-label', 'Field name');
       const name = node('input', 'field-name');
+      name.id = `${container.id}-name-${index}`;
+      nameLabel.htmlFor = name.id;
+      name.setAttribute('list', 'fieldNameOptions');
+      name.setAttribute('aria-describedby', 'fieldGuide');
       name.value = field.label;
       name.placeholder = 'Field name';
       name.maxLength = 60;
@@ -294,7 +391,8 @@
         field.label = name.value;
         changed();
       });
-      head.append(name);
+      nameLabel.append(name);
+      head.append(nameLabel);
       const tools = node('div', 'field-tools');
       const textButton = button('Type', '', () => switchMode('text'));
       const drawButton = button('Draw', '', () => switchMode('draw'));
@@ -320,7 +418,14 @@
       section.append(head);
       const textarea = node('textarea', 'field-text');
       textarea.value = field.text;
-      textarea.placeholder = index ? 'Write here…' : 'Write a note…';
+      textarea.placeholder =
+        field.slot === 'cues'
+          ? 'Questions or key words…'
+          : field.slot === 'summary'
+            ? 'Sum up the main idea…'
+            : index
+              ? 'Write here…'
+              : 'Write a note…';
       textarea.setAttribute('aria-label', `Field ${index + 1} text`);
       textarea.addEventListener('input', () => {
         field.text = textarea.value;
@@ -464,9 +569,9 @@
       f.label = f.label.trim() || 'Notes';
     });
     note.text = note.fields.map((f) => f.text).join('\n\n');
-    if (!write(KEYS.notes, [...notes, note])) return;
+    if (!saveNoteLists([...notes, note])) return;
     notes.push(note);
-    draft = blankDraft(draft.color);
+    draft = blankDraft();
     // Clear the legacy draft only after the new note was safely written.
     try {
       localStorage.removeItem(KEYS.legacyDraft);
@@ -474,7 +579,7 @@
     } catch {
       // Saved note remains available.
     }
-    $('templateSelect').value = '';
+    renderTemplates();
     renderCapture();
     renderNavigation();
     renderRecent();
@@ -487,6 +592,8 @@
   function renderNavigation() {
     $('noteCount').textContent = notes.length;
     $('reminderCount').textContent = notes.filter(pending).length;
+    $('trashCount').textContent = trash.length;
+    renderFieldSuggestions();
     const collections = [...new Set(['Inbox', ...notes.map((n) => n.category)])].sort(
       (a, b) => (a === 'Inbox' ? -1 : b === 'Inbox' ? 1 : a.localeCompare(b)),
     );
@@ -514,6 +621,22 @@
     });
     $('collectionFilter').value = collections.includes(selected) ? selected : '';
   }
+  function renderFieldSuggestions() {
+    const labels = new Set([
+      'Notes',
+      'Questions',
+      'Tasks',
+      ...notes.flatMap((note) => note.fields.map((field) => field.label.trim())),
+      ...draft.fields.map((field) => field.label.trim()),
+      ...[...builtins, ...templates].flatMap((template) => template.labels),
+    ]);
+    $('fieldNameOptions').replaceChildren(
+      ...[...labels]
+        .filter(Boolean)
+        .sort()
+        .map((label) => new Option(label, label)),
+    );
+  }
   function renderRecent() {
     $('recentCount').textContent = String(notes.length).padStart(2, '0');
     $('recentNotes').replaceChildren();
@@ -527,7 +650,7 @@
       .slice(0, 3)
       .forEach((note) => {
         const card = button('', 'recent-note', () => openEditor(note.id));
-        card.style.setProperty('--note', note.color);
+        paintNote(card, note.color);
         const meta = node('div', 'recent-label');
         meta.append(
           node('span', '', note.category),
@@ -555,15 +678,24 @@
     const capture = next === 'capture';
     $('captureView').hidden = !capture;
     $('reviewView').hidden = capture;
-    ['capture', 'review', 'reminders'].forEach((name) => {
+    ['capture', 'review', 'reminders', 'trash'].forEach((name) => {
       const nav = $(`${name}Nav`);
       nav.classList.toggle('selected', name === next);
       if (name === next) nav.setAttribute('aria-current', 'page');
       else nav.removeAttribute('aria-current');
     });
     $('breadcrumb').textContent =
-      `Workspace / ${capture ? 'Quick capture' : next === 'reminders' ? 'Reminders' : 'My notebook'}`;
-    $('reviewHeading').textContent = next === 'reminders' ? 'Reminders' : 'My notebook';
+      `Workspace / ${capture ? 'Quick capture' : next === 'reminders' ? 'Reminders' : next === 'trash' ? 'Recently Deleted' : 'My notebook'}`;
+    $('reviewHeading').textContent =
+      next === 'reminders'
+        ? 'Reminders'
+        : next === 'trash'
+          ? 'Recently Deleted'
+          : 'My notebook';
+    $('collectionFilter').hidden = next === 'trash';
+    document.querySelector('label[for="collectionFilter"]').hidden = next === 'trash';
+    $('pinnedFilter').closest('label').hidden = next === 'trash';
+    $('exportButton').hidden = next === 'trash';
     renderNavigation();
     renderRecent();
     if (!capture) renderBoard();
@@ -574,6 +706,11 @@
     else $('searchInput').focus();
   }
   function renderBoard() {
+    if (view === 'trash') {
+      renderTrash();
+      return;
+    }
+    $('reviewBoard').classList.remove('trash-board');
     const query = $('searchInput').value.trim().toLocaleLowerCase();
     const collection = $('collectionFilter').value;
     const matches = notes.filter(
@@ -621,7 +758,7 @@
   }
   function renderCard(note, field, index) {
     const card = node('article', 'board-card');
-    card.style.setProperty('--note', note.color);
+    paintNote(card, note.color);
     const meta = node('div', 'card-meta');
     meta.append(
       node('span', '', note.category),
@@ -685,11 +822,90 @@
     if (!note) return;
     mutate(note);
     note.updatedAt = new Date().toISOString();
-    if (!write(KEYS.notes, updated)) return;
+    if (!saveNoteLists(updated)) return;
     notes = updated;
     renderNavigation();
     renderRecent();
     renderBoard();
+  }
+
+  // Deleted notes stay in the same storage record for safe recovery.
+  function moveToTrash(id) {
+    const note = notes.find((candidate) => candidate.id === id);
+    if (!note) return;
+    const remaining = notes.filter((candidate) => candidate.id !== id);
+    const nextTrash = [...trash, { ...copy(note), deletedAt: new Date().toISOString() }];
+    if (!saveNoteLists(remaining, nextTrash)) return;
+    notes = remaining;
+    trash = nextTrash;
+    $('noteDialog').close();
+    renderNavigation();
+    renderRecent();
+    renderBoard();
+    toast('Note moved to Recently Deleted.', {
+      label: 'Undo',
+      run: () => restoreNote(id),
+    });
+  }
+  function restoreNote(id) {
+    const deleted = trash.find((note) => note.id === id);
+    if (!deleted) return;
+    const restored = { ...copy(deleted), deletedAt: '' };
+    const nextNotes = [...notes, restored];
+    const nextTrash = trash.filter((note) => note.id !== id);
+    if (!saveNoteLists(nextNotes, nextTrash)) return;
+    notes = nextNotes;
+    trash = nextTrash;
+    announcedReminders.delete(restored.id + restored.reminderAt);
+    renderNavigation();
+    renderRecent();
+    renderBoard();
+    toast('Note restored.');
+  }
+  function renderTrash() {
+    const query = $('searchInput').value.trim().toLocaleLowerCase();
+    const matches = trash
+      .filter((note) =>
+        [
+          note.title,
+          note.category,
+          ...note.fields.flatMap((field) => [field.label, field.text]),
+        ]
+          .join('\n')
+          .toLocaleLowerCase()
+          .includes(query),
+      )
+      .sort((a, b) => Date.parse(b.deletedAt) - Date.parse(a.deletedAt));
+    $('reviewBoard').classList.add('trash-board');
+    $('reviewBoard').replaceChildren();
+    $('dueBanner').hidden = true;
+    $('reviewEmpty').hidden = matches.length > 0;
+    $('emptyMessage').textContent = !trash.length
+      ? 'No deleted notes. Notes you delete can be restored here.'
+      : 'No deleted notes match this search.';
+    matches.forEach((note) => {
+      const card = node('article', 'board-card deleted-note');
+      paintNote(card, note.color);
+      card.append(
+        node('p', 'card-meta', `Deleted ${reminderLabel(note.deletedAt)}`),
+        node('h2', 'deleted-title', titleOf(note)),
+        node(
+          'p',
+          'deleted-preview',
+          note.fields
+            .map((field) => field.text)
+            .filter(Boolean)
+            .join(' · ') || 'A saved drawing',
+        ),
+        node(
+          'p',
+          'deleted-meta',
+          `${note.category} · ${note.fields.length} ${note.fields.length === 1 ? 'field' : 'fields'}`,
+        ),
+        button('Restore', 'secondary', () => restoreNote(note.id)),
+      );
+      $('reviewBoard').append(card);
+    });
   }
   function openEditor(id) {
     const note = notes.find((n) => n.id === id);
@@ -700,9 +916,9 @@
     $('editReminder').value = localDate(editor.reminderAt);
     $('editPinned').checked = editor.pinned;
     $('editReminder').dispatchEvent(new Event('picker-sync'));
-    $('editPaper').style.setProperty('--note', editor.color);
+    paintNote($('editPaper'), editor.color);
     paintColors($('editColors'), editor, () =>
-      $('editPaper').style.setProperty('--note', editor.color),
+      paintNote($('editPaper'), editor.color),
     );
     renderFields($('editFields'), editor, () => {});
     $('editorMeta').textContent =
@@ -726,12 +942,17 @@
 
   // Template menu and reminder checks
   function renderTemplates() {
-    const selected = $('templateSelect').value;
-    $('templateSelect').replaceChildren(new Option('Blank note', ''));
+    $('templateSelect').replaceChildren();
     [...builtins, ...templates].forEach((t) =>
       $('templateSelect').append(new Option(t.name, t.id)),
     );
-    $('templateSelect').value = selected;
+    const selected = [...builtins, ...templates].find((t) => t.id === draft.templateId);
+    if (!selected) {
+      const custom = new Option('Custom fields', '');
+      custom.disabled = true;
+      $('templateSelect').prepend(custom);
+    }
+    $('templateSelect').value = selected?.id || '';
   }
   function checkReminders() {
     const fresh = notes.filter(
@@ -742,7 +963,6 @@
     $('reminderCount').textContent = notes.filter(pending).length;
     if (view !== 'capture') renderBoard();
   }
-
 
   // Navigation, capture, and editor events
   $('captureNav').addEventListener('click', () => showView('capture'));
@@ -755,6 +975,34 @@
     $('searchInput').value = '';
     $('pinnedFilter').checked = false;
     showView('reminders');
+  });
+  $('trashNav').addEventListener('click', () => {
+    $('searchInput').value = '';
+    showView('trash');
+  });
+  $('helpButton').addEventListener('click', () => $('helpDialog').showModal());
+  $('closeHelp').addEventListener('click', () => $('helpDialog').close());
+
+  // Account forms are a demo. Nothing is sent or saved.
+  function showAccount(mode) {
+    const signup = mode === 'signup';
+    $('accountForm').reset();
+    $('accountHeading').textContent = signup ? 'Sign up' : 'Sign in';
+    $('accountSubmit').textContent = signup ? 'Sign up' : 'Sign in';
+    $('accountNameField').hidden = !signup;
+    $('accountName').required = signup;
+    $('accountPassword').autocomplete = signup ? 'new-password' : 'off';
+    $('accountDialog').showModal();
+    $(signup ? 'accountName' : 'accountEmail').focus();
+  }
+  $('signInButton').addEventListener('click', () => showAccount('signin'));
+  $('signUpButton').addEventListener('click', () => showAccount('signup'));
+  $('closeAccount').addEventListener('click', () => $('accountDialog').close());
+  $('accountDialog').addEventListener('close', () => $('accountForm').reset());
+  $('accountForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    $('accountDialog').close();
+    toast('Just a demo for now. No account was created or signed in.');
   });
   document.querySelector('.brand').addEventListener('click', (e) => {
     e.preventDefault();
@@ -793,15 +1041,17 @@
       (hasContent(draft) || draft.title.trim()) &&
       !confirm('Replace the current draft with this template?')
     ) {
-      $('templateSelect').value = '';
+      renderTemplates();
       return;
     }
     const template = [...builtins, ...templates].find(
       (t) => t.id === $('templateSelect').value,
     );
+    draft.templateId = template?.id || '';
     draft.fields = template
-      ? template.labels.map((label) => blankField(label))
+      ? template.labels.map((label, index) => blankField(label, template.slots?.[index]))
       : [blankField()];
+    draft.layout = noteLayout(template?.layout);
     if (!draft.fields.length) draft.fields = [blankField()];
     draft.title = '';
     if (template?.color) draft.color = colorValue(template.color);
@@ -824,7 +1074,7 @@
     }
     note.updatedAt = new Date().toISOString();
     const updated = notes.map((n) => (n.id === note.id ? copy(note) : n));
-    if (!write(KEYS.notes, updated)) return;
+    if (!saveNoteLists(updated)) return;
     notes = updated;
     $('noteDialog').close();
     renderNavigation();
@@ -834,19 +1084,12 @@
     checkReminders();
   });
   $('deleteNote').addEventListener('click', () => {
-    if (!confirm('Delete this note and all its fields? This cannot be undone.')) return;
-    const updated = notes.filter((n) => n.id !== editor.id);
-    if (!write(KEYS.notes, updated)) return;
-    notes = updated;
-    $('noteDialog').close();
-    renderNavigation();
-    renderRecent();
-    renderBoard();
-    toast('Note deleted.');
+    if (!confirm('Move this note to Recently Deleted? You can restore it there.')) return;
+    moveToTrash(editor.id);
   });
   $('saveTemplate').addEventListener('click', () => {
     const name = prompt(
-      'Template name. Only field labels and color are saved; your note content stays out.',
+      'Name your template. It keeps the field names, layout, and colors, not your writing.',
       $('editTitle').value || 'My template',
     );
     if (!name?.trim()) return;
@@ -857,6 +1100,8 @@
         name: name.trim().slice(0, 60),
         color: editor.color,
         labels: editor.fields.map((f) => f.label.trim() || 'Notes'),
+        layout: noteLayout(editor.layout),
+        slots: editor.fields.map((field) => fieldSlot(field.slot)),
       },
     ];
     if (!write(KEYS.templates, updated)) return;

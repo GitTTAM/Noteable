@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="reminder-picker.css" />
+    <link rel="stylesheet" href="usability.css" />
     <script src="reminder-picker.js" defer></script>
     <script src="app.js" defer></script>
   </head>
@@ -39,6 +40,11 @@
           Reminders
           <span class="nav-count" id="reminderCount">0</span>
         </button>
+        <button class="nav-item" id="trashNav" type="button">
+          <span aria-hidden="true">↶</span>
+          Recently Deleted
+          <span class="nav-count" id="trashCount">0</span>
+        </button>
         <div class="nav-heading">
           <p class="nav-label">COLLECTIONS</p>
           <span aria-hidden="true">↳</span>
@@ -53,6 +59,21 @@
     <div class="workspace">
       <!-- Workspace header -->
       <header class="topbar">
+        <div class="header-actions" role="group" aria-label="Account and help">
+          <button class="text-button account-button" id="signInButton" type="button">
+            Sign in
+          </button>
+          <button
+            class="text-button account-button signup-button"
+            id="signUpButton"
+            type="button"
+          >
+            Sign up
+          </button>
+          <button class="text-button help-button" id="helpButton" type="button">
+            Help / FAQ
+          </button>
+        </div>
         <span id="breadcrumb">
           Workspace
           <span aria-hidden="true">/</span>
@@ -87,9 +108,26 @@
               <article class="capture-pad" id="capturePad">
                 <div class="pad-topline">
                   <span class="paper-label">NEW NOTE</span>
-                  <span id="draftStatus" class="paper-label" role="status">
-                    Empty draft
-                  </span>
+                  <button
+                    class="reminder-toggle"
+                    id="captureOptionsButton"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="captureOptions"
+                  >
+                    ◷ Add a reminder
+                  </button>
+                </div>
+                <div class="capture-options" id="captureOptions" hidden>
+                  <div class="reminder-field">
+                    <span>Remind me</span>
+                    <input
+                      type="datetime-local"
+                      id="draftReminder"
+                      aria-label="Capture reminder"
+                    />
+                  </div>
+                  <p>Alerts show while Noteable is open or when you return.</p>
                 </div>
                 <label class="sr-only" for="draftTitle">Note title, optional</label>
                 <input
@@ -99,21 +137,19 @@
                   maxlength="160"
                   autocomplete="off"
                 />
+                <p class="field-guide" id="fieldGuide">
+                  Change a field name to choose its notebook column. Reuse a name to group
+                  notes together.
+                </p>
                 <div id="captureFields"></div>
                 <button class="add-field" id="addCaptureField" type="button">
                   ＋ New field
                 </button>
               </article>
               <div class="capture-actions">
-                <button
-                  class="text-button"
-                  id="captureOptionsButton"
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls="captureOptions"
-                >
-                  ◷ Add a reminder
-                </button>
+                <span id="draftStatus" class="draft-status" role="status">
+                  Empty draft
+                </span>
                 <div class="save-action">
                   <kbd>Ctrl ↵</kbd>
                   <button class="primary" id="saveCapture" type="button">
@@ -121,21 +157,6 @@
                     <span aria-hidden="true">↗</span>
                   </button>
                 </div>
-              </div>
-              <!-- Optional reminder fields -->
-              <div class="capture-options" id="captureOptions" hidden>
-                <div class="reminder-field">
-                  <span>Remind me</span>
-                  <input
-                    type="datetime-local"
-                    id="draftReminder"
-                    aria-label="Capture reminder"
-                  />
-                </div>
-                <p>
-                  Shows an alert here while this app is open. Past-due alerts appear when
-                  you return.
-                </p>
               </div>
             </div>
             <!-- Recent notes -->
@@ -256,6 +277,110 @@
           <button class="primary" type="submit">Save changes ↗</button>
         </div>
       </form>
+    </dialog>
+    <datalist id="fieldNameOptions"></datalist>
+    <dialog
+      id="accountDialog"
+      aria-labelledby="accountHeading"
+      aria-describedby="accountDemo"
+    >
+      <form id="accountForm" autocomplete="off">
+        <div class="dialog-heading">
+          <h2 id="accountHeading">Sign in</h2>
+          <button
+            class="icon-button"
+            id="closeAccount"
+            type="button"
+            aria-label="Close account form"
+          >
+            ×
+          </button>
+        </div>
+        <p id="accountDemo">Just a demo. Use made-up details — nothing gets sent or saved.</p>
+        <label class="form-label" id="accountNameField" hidden>
+          Name
+          <input id="accountName" type="text" maxlength="80" />
+        </label>
+        <label class="form-label">
+          Email
+          <input id="accountEmail" type="email" required />
+        </label>
+        <label class="form-label">
+          Password
+          <input id="accountPassword" type="password" required autocomplete="off" />
+        </label>
+        <button class="primary" id="accountSubmit" type="submit">Sign in</button>
+      </form>
+    </dialog>
+    <dialog id="helpDialog" aria-labelledby="helpHeading">
+      <div class="dialog-heading">
+        <h2 id="helpHeading">Help / FAQ</h2>
+        <button class="icon-button" id="closeHelp" type="button" aria-label="Close help">
+          ×
+        </button>
+      </div>
+      <details open>
+        <summary>What's a field?</summary>
+        <p>
+          It's a section of your note. Give it a name like Questions or Tasks.
+          In My notebook, sections with the same name sit in the same column.
+          Pick a suggested name if you want to use one again.
+        </p>
+      </details>
+      <details>
+        <summary>What about collections?</summary>
+        <p>
+          Think of them as folders. New notes land in Inbox. Open a note and change
+          its collection to keep your classes or projects together.
+        </p>
+      </details>
+      <details>
+        <summary>How do I use a template?</summary>
+        <p>
+          Cornell notes is ready when you open the app: questions on the left, notes
+          on the right, and a summary below. Start from also has To-do list and
+          Class notes. Want your own setup? Open a saved note and click Save as template.
+          It keeps the layout, field names, and colors, with none of your writing.
+        </p>
+      </details>
+      <details>
+        <summary>Can I type and draw in the same field?</summary>
+        <p>
+          Yep. Click Draw to sketch, or Type to write. Switching keeps both.
+          Sketches stay as pictures; the app doesn't read your handwriting.
+        </p>
+      </details>
+      <details>
+        <summary>How do reminders work?</summary>
+        <p>
+          Click Add a reminder at the top right of your note, then pick a date and time.
+          It starts at right now, so set it to when you need a nudge. You'll see the
+          reminder here while the app is open or when you come back.
+        </p>
+      </details>
+      <details>
+        <summary>Oops, I deleted a note. Now what?</summary>
+        <p>
+          Click Undo right away, or head to Recently Deleted and hit Restore.
+          Your writing, sketches, collection, and reminder all come back.
+          Deleted notes stay there unless you clear your browser data.
+        </p>
+      </details>
+      <details>
+        <summary>Do I need to sign in?</summary>
+        <p>
+          Nope. Sign in and Sign up are just demo screens for our class project.
+          Use made-up details if you try them. They don't create accounts or send anything.
+        </p>
+      </details>
+      <details>
+        <summary>Will my notes still be here later?</summary>
+        <p>
+          Yes, in this browser on this device. Drafts save as you type.
+          Ctrl + Enter saves a new note. When editing one, click Save changes.
+          Clearing browser data deletes your notes. Export notes doesn't do anything yet.
+        </p>
+      </details>
     </dialog>
     <!-- Status messages -->
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

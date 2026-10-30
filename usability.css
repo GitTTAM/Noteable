@@ -1,0 +1,464 @@
+/* Editable areas and a quieter background */
+body {
+  background-image: linear-gradient(#080d25b8, #080d25b8), url('Wallpaper.jpg');
+}
+
+/* Bold color pairs follow each note through the app */
+.capture-pad,
+.editor-paper,
+.board-card,
+.recent-note {
+  border-top: 8px solid var(--note-accent, #554a36);
+  color: var(--note-ink, #292a31);
+}
+
+.capture-pad .paper-label,
+.capture-pad .field-guide,
+.field-name-label,
+.drawing-help,
+.capture-pad .text-button,
+.editor-paper .text-button,
+.board-card .card-open,
+.board-card .card-meta,
+.board-card .card-footer button,
+.board-card .text-button,
+.board-card .reminder-badge,
+.recent-note .recent-label,
+.recent-note p {
+  color: var(--note-ink, #292a31);
+}
+
+.board-card .reminder-badge.overdue {
+  color: var(--note-ink, #292a31);
+  text-decoration: underline;
+}
+
+.card-open img {
+  background: #fff9e6;
+}
+
+.swatch:before {
+  background: linear-gradient(135deg, var(--swatch) 50%, var(--swatch-accent) 50%);
+  box-shadow: inset 0 0 0 1px #ffffff70;
+}
+
+.swatch[aria-pressed='true'] {
+  border-color: #fff9e6;
+}
+
+.note-title {
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 2px solid #7c6b50;
+  border-radius: 2px;
+  background: #fff9e6;
+  color: #202027;
+  font-size: 21px;
+}
+
+.field-guide {
+  margin: 0 0 18px;
+  color: #514631;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.note-fields {
+  display: grid;
+  gap: 16px;
+}
+
+.note-field {
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 2px solid var(--note-accent, #857254);
+  border-radius: 2px;
+  background: #0000000c;
+}
+
+.field-head {
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.field-name-label {
+  display: grid;
+  flex: 1 1 150px;
+  min-width: 0;
+  gap: 6px;
+  color: var(--note-ink, #514631);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.field-name {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 2px solid #7c6b50;
+  border-radius: 2px;
+  background: #fff9e6;
+  color: #292a31;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.field-tools {
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.field-tools button {
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+}
+
+.field-tools button[aria-pressed='true'],
+.field-tools button:hover {
+  background: #fff9e6;
+  color: #202027;
+}
+
+.field-text {
+  min-height: 140px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #8a795a;
+  border-radius: 2px;
+  background: #fff9e6;
+  color: #202027;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.drawing {
+  border: 2px dashed #79684b;
+  background: #fff9e6;
+}
+
+.add-field {
+  min-height: 42px;
+  margin-top: 15px;
+  padding: 8px 12px;
+  border: 1px dashed #655236;
+  background: #fff9e680;
+  color: #202027;
+}
+
+/* Cornell keeps its familiar cues, notes, and summary layout */
+.note-fields[data-layout='cornell'] {
+  grid-template-columns: minmax(130px, 0.8fr) minmax(0, 1.6fr);
+}
+
+.note-fields[data-layout='cornell'] .field-name-label {
+  flex-basis: 100%;
+}
+
+.note-fields[data-layout='cornell'] [data-slot='cues'] {
+  grid-column: 1;
+}
+
+.note-fields[data-layout='cornell'] [data-slot='notes'] {
+  grid-column: 2;
+}
+
+.note-fields[data-layout='cornell'] [data-slot='summary'],
+.note-fields[data-layout='cornell'] [data-slot='extra'] {
+  grid-column: 1 / -1;
+}
+
+/* Reminder action stays at the top of the capture pad */
+.pad-topline {
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.reminder-toggle {
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid #632b20;
+  border-radius: 2px;
+  background: #a93b24;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.reminder-toggle:hover {
+  background: #8b2b1a;
+}
+
+.reminder-toggle.has-reminder {
+  box-shadow: inset 0 0 0 1px #ffd391;
+}
+
+.capture-pad .capture-options {
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid #79684b;
+  background: #fff9e6;
+  color: #292a31;
+}
+
+.capture-pad .capture-options p {
+  margin-bottom: 0;
+  color: #55515a;
+  font-size: 10px;
+}
+
+.draft-status {
+  color: #d9d3e2;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.capture-actions {
+  align-items: center;
+  gap: 16px;
+}
+
+.save-action {
+  flex-shrink: 0;
+}
+
+/* Short help for new users */
+.topbar {
+  height: auto;
+  min-height: 64px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#breadcrumb {
+  margin-left: auto;
+  line-height: 1.6;
+}
+
+.device-view-link {
+  margin: 0;
+}
+
+.account-button,
+.help-button {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #ad8a6c;
+  border-radius: 2px;
+  color: #ffdbad;
+  white-space: nowrap;
+}
+
+.signup-button {
+  background: #ffe600;
+  border-color: #ffe600;
+  color: #171717;
+}
+
+.signup-button:hover {
+  background: #ffef65;
+  color: #171717;
+}
+
+#accountDialog {
+  width: min(440px, calc(100vw - 32px));
+}
+
+#accountDemo {
+  margin: 0 0 20px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+#accountForm .form-label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#accountForm input {
+  width: 100%;
+  padding: 10px;
+}
+
+#accountSubmit {
+  width: 100%;
+  margin-top: 4px;
+}
+
+#helpDialog {
+  max-width: 640px;
+}
+
+#helpDialog details {
+  padding: 8px 0;
+  border-top: 1px solid #c8bdab;
+}
+
+#helpDialog summary {
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+#helpDialog p {
+  margin: 4px 0 12px;
+  color: #55515a;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* Undo and deleted notes */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.toast.visible {
+  pointer-events: auto;
+}
+
+.toast-action {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid #ffbe7c;
+  border-radius: 2px;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+}
+
+.toast-action:hover {
+  background: #ffffff20;
+}
+
+.review-board.trash-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
+  overflow: visible;
+}
+
+.deleted-title {
+  margin: 0 0 12px;
+  font-size: 19px;
+  overflow-wrap: anywhere;
+}
+
+.deleted-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.deleted-meta {
+  font-size: 10px;
+}
+
+/* Smaller capture areas show Cornell fields in reading order */
+@media (max-width: 1050px) {
+  #captureFields[data-layout='cornell'] {
+    grid-template-columns: 1fr;
+  }
+
+  #captureFields[data-layout='cornell'] .note-field {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 620px) {
+  .topbar {
+    justify-content: flex-start;
+    gap: 8px 12px;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  #breadcrumb {
+    margin-left: 0;
+    font-size: 9px;
+  }
+
+  .device-view-link {
+    margin-left: auto;
+  }
+
+  .sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .nav-item {
+    justify-content: flex-start;
+    min-width: 0;
+    min-height: 44px;
+  }
+
+  .nav-count {
+    margin-left: auto;
+  }
+
+  .topbar .prototype-tag {
+    display: none;
+  }
+
+  .note-title {
+    font-size: 18px;
+  }
+
+  .capture-pad,
+  .editor-paper {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .note-field {
+    padding: 11px;
+  }
+
+  .note-fields[data-layout='cornell'] {
+    grid-template-columns: 1fr;
+  }
+
+  .note-fields[data-layout='cornell'] .note-field {
+    grid-column: 1;
+  }
+
+  .capture-actions {
+    flex-wrap: wrap;
+  }
+
+  .save-action {
+    margin-left: auto;
+  }
+
+  .reminder-toggle {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+
+  .review-board.trash-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
