@@ -234,16 +234,17 @@ body {
   gap: 12px 20px;
 }
 
-.header-actions {
+.header-actions,
+.header-tools {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
 }
 
-#breadcrumb {
+.header-tools {
   margin-left: auto;
-  line-height: 1.6;
+  gap: 16px;
 }
 
 .device-view-link {
@@ -390,17 +391,19 @@ body {
     gap: 8px 12px;
   }
 
-  .header-actions {
-    width: 100%;
+  .header-actions,
+  .header-tools {
+    gap: 6px;
   }
 
-  #breadcrumb {
-    margin-left: 0;
-    font-size: 9px;
+  .account-button,
+  .help-button {
+    padding: 7px 8px;
+    font-size: 10px;
   }
 
   .device-view-link {
-    margin-left: auto;
+    margin: 0;
   }
 
   .sidebar nav {
@@ -417,10 +420,6 @@ body {
 
   .nav-count {
     margin-left: auto;
-  }
-
-  .topbar .prototype-tag {
-    display: none;
   }
 
   .note-title {

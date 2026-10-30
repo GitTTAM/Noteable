@@ -59,7 +59,7 @@
     <div class="workspace">
       <!-- Workspace header -->
       <header class="topbar">
-        <div class="header-actions" role="group" aria-label="Account and help">
+        <div class="header-actions" role="group" aria-label="Account">
           <button class="text-button account-button" id="signInButton" type="button">
             Sign in
           </button>
@@ -70,20 +70,18 @@
           >
             Sign up
           </button>
-          <button class="text-button help-button" id="helpButton" type="button">
-            Help / FAQ
-          </button>
         </div>
-        <span id="breadcrumb">
+        <span id="breadcrumb" class="sr-only">
           Workspace
           <span aria-hidden="true">/</span>
           Quick capture
         </span>
-        <a class="device-view-link" href="preview.html">Device views ↗</a>
-        <span class="prototype-tag">
-          CLASS PROTOTYPE
-          <span class="status-dot"></span>
-        </span>
+        <div class="header-tools" role="group" aria-label="Help and device views">
+          <a class="device-view-link" href="preview.html">Device views ↗</a>
+          <button class="text-button help-button" id="helpButton" type="button">
+            Help / FAQ
+          </button>
+        </div>
       </header>
       <main>
         <!-- Quick capture -->
