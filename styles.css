@@ -8,17 +8,9 @@
     "Liberation Mono",
     "Courier New",
     monospace;
-  --desk: #f5f3ed;
-  --paper: #fffef9;
-  --ink: #2c3932;
-  --muted: #6c726a;
-  --line: #dcded3;
-  --green: #345c43;
-  --note: #f5df87;
+  --note: #ffe600;
   --sidebar: 246px;
-  font-family: var(--typeface);
   color: var(--ink);
-  background: var(--desk);
   font-synthesis: none;
 }
 
@@ -94,7 +86,6 @@ p {
   inset: 0 auto 0 0;
   width: var(--sidebar);
   padding: 36px 24px;
-  background: #eeeee5;
   border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
@@ -106,20 +97,15 @@ p {
   gap: 11px;
   align-items: center;
   text-decoration: none;
-  font-size: 20px;
   font-weight: 750;
-  letter-spacing: -.9px;
 }
 
 .brand-mark {
   background: #e7c963;
-  border-radius: 5px 5px 13px 5px;
   width: 36px;
   height: 38px;
   text-align: center;
-  line-height: 32px;
   font: italic 32px var(--typeface);
-  box-shadow: 2px 2px 0 #d6b852;
   flex: none;
 }
 
@@ -131,7 +117,6 @@ nav {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.6px;
-  color: #777d70;
   margin: 0 0 14px 10px;
 }
 
@@ -141,7 +126,6 @@ nav {
   gap: 11px;
   width: 100%;
   text-align: left;
-  border-radius: 6px;
   padding: 10px 12px;
   font-size: 13px;
   background: transparent;
@@ -156,12 +140,7 @@ nav {
   text-align: center;
 }
 
-.nav-item:hover {
-  background: #e3e5d8;
-}
-
 .nav-item.selected {
-  background: #dfe5d3;
   font-weight: 650;
 }
 
@@ -170,7 +149,6 @@ nav {
   margin-left: auto;
   font-size: 10px !important;
   width: auto !important;
-  color: var(--muted);
 }
 
 .nav-key {
@@ -183,7 +161,6 @@ nav {
   display: flex;
   justify-content: space-between;
   margin-top: 38px;
-  color: var(--muted);
 }
 
 .nav-item.collection {
@@ -194,7 +171,6 @@ nav {
   width: 8px !important;
   height: 8px;
   border-radius: 50%;
-  background: #b0b99a;
   flex: none;
   margin: 5px;
 }
@@ -203,15 +179,6 @@ nav {
   margin-top: auto;
   padding-top: 45px;
   font-size: 10px;
-  color: var(--muted);
-}
-
-.status-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #6f8861;
 }
 
 .sidebar-bottom p {
@@ -225,31 +192,12 @@ nav {
 }
 
 .topbar {
-  height: 77px;
   border-bottom: 1px solid var(--line);
   padding: 0 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 11px;
-  color: var(--muted);
-}
-
-.topbar span span {
-  margin: 0 15px;
-  color: #a1a592;
-}
-
-.prototype-tag {
-  font-size: 9px;
-  letter-spacing: 1.1px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.prototype-tag .status-dot {
-  margin: 0;
 }
 
 main {
@@ -262,21 +210,10 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 38px;
 }
 
 h1 {
-  font-family: var(--typeface);
-  font-weight: 400;
-  font-size: clamp(36px,4vw,57px);
-  letter-spacing: -2px;
   line-height: 1.08;
-  margin: 0 0 17px;
-}
-
-h1 em {
-  font-weight: 400;
-  color: #6f7b61;
 }
 
 /* Capture layout, colors, and paper */
@@ -284,7 +221,6 @@ h1 em {
 .capture-layout {
   display: grid;
   grid-template-columns: minmax(0,1fr) 215px;
-  gap: 46px;
   align-items: start;
 }
 
@@ -321,12 +257,6 @@ h1 em {
   width: 19px;
   height: 19px;
   border-radius: 50%;
-  background: var(--swatch);
-  box-shadow: inset 0 0 0 1px #00000012;
-}
-
-.swatch[aria-pressed="true"] {
-  border-color: #657454;
 }
 
 .template-picker {
@@ -334,11 +264,9 @@ h1 em {
   align-items: center;
   gap: 8px;
   font-size: 10px;
-  color: var(--muted);
 }
 
 select {
-  background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 5px;
   padding: 0 28px 0 10px;
@@ -354,9 +282,7 @@ select {
 .capture-pad {
   position: relative;
   background: var(--note);
-  border-radius: 3px 3px 22px 3px;
   padding: 25px 29px 17px;
-  box-shadow: 0 12px 25px -18px #594d36, 0 3px 0 -1px #d5c884;
   min-height: 365px;
   transition: background .2s;
 }
@@ -366,10 +292,7 @@ select {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 29px;
-  height: 29px;
   background: linear-gradient(135deg,#00000006 50%,#ffffff80 51%);
-  border-radius: 0 0 21px 0;
   pointer-events: none;
 }
 
@@ -377,7 +300,6 @@ select {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 22px;
 }
 
 .paper-label {
@@ -386,55 +308,26 @@ select {
   color: #5f5a38;
 }
 
-.paper-label:last-child {
-  letter-spacing: .1px;
-  font-size: 9px;
-  text-transform: none;
-}
-
 .note-title {
-  border: 0;
-  background: transparent;
   width: 100%;
   font: 27px var(--typeface);
-  letter-spacing: -.6px;
-  padding: 0;
-  min-height: 40px;
   margin: 0 0 12px;
-}
-
-.note-title::placeholder {
-  color: #746d42;
-  opacity: .85;
 }
 
 /* Note fields and drawing tools */
 
 .note-field {
   position: relative;
-  border-top: 1px solid #4c543428;
-  padding-top: 13px;
-  margin-top: 7px;
 }
 
 .field-head {
   display: flex;
-  align-items: center;
-  gap: 8px;
   flex-wrap: wrap;
 }
 
 .field-name {
-  background: transparent;
-  border: 0;
-  min-height: 30px;
   flex: 1;
-  min-width: 80px;
-  width: 100px;
-  font-size: 10px;
   font-weight: 650;
-  letter-spacing: .4px;
-  padding: 0;
 }
 
 .field-tools {
@@ -445,68 +338,35 @@ select {
 .field-tools button {
   background: transparent;
   font-size: 9px;
-  min-height: 30px;
-  padding: 4px 8px;
   border-radius: 4px;
-}
-
-.field-tools button[aria-pressed="true"] {
-  background: #ffffff70;
-}
-
-.field-tools button:hover {
-  background: #ffffff90;
 }
 
 .field-text {
   width: 100%;
-  background: transparent;
-  border: 0;
   resize: vertical;
-  min-height: 132px;
-  padding: 12px 0;
   font: 17px/1.8 var(--typeface);
-}
-
-.field-text::placeholder {
-  color: #746d42;
-  opacity: .75;
 }
 
 .drawing {
   display: block;
   width: 100%;
   height: 180px;
-  border: 1px dashed #5b64474d;
   border-radius: 4px;
   margin: 10px 0;
   touch-action: none;
   cursor: crosshair;
-  background: #ffffff20;
 }
 
 .drawing-help {
   font-size: 10px;
-  color: #5a604b;
   line-height: 1.5;
   margin: 7px 0;
 }
 
 .add-field {
-  padding: 9px 0;
-  background: transparent;
   font-size: 11px;
-  border-bottom: 1px dashed #68653a65;
-  min-height: 36px;
   text-align: left;
   margin: 4px 0 12px;
-}
-
-.add-field span {
-  font-size: 9px;
-  font-weight: 400;
-  opacity: .65;
-  margin-left: 10px;
 }
 
 /* Capture actions and shared buttons */
@@ -514,40 +374,26 @@ select {
 .capture-actions {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
   margin-top: 22px;
-  align-items: center;
 }
 
 .text-button {
   background: transparent;
-  color: var(--muted);
   font-size: 11px;
   padding: 6px 0;
 }
 
 .text-button:hover {
-  color: var(--green);
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 
 .primary,
 .secondary {
-  border-radius: 5px;
   font-size: 11px;
   min-height: 42px;
   padding: 11px 19px;
   font-weight: 600;
-}
-
-.primary {
-  background: var(--green);
-  color: #fffef9;
-}
-
-.primary:hover {
-  background: #274c35;
 }
 
 .primary span {
@@ -556,7 +402,6 @@ select {
 
 .secondary {
   border: 1px solid var(--line);
-  background: var(--paper);
 }
 
 .save-action {
@@ -576,35 +421,19 @@ label {
 
 /* Reminder settings */
 
-.capture-options {
-  padding: 15px 0;
-}
-
 .capture-options label {
   display: flex;
   gap: 15px;
   align-items: center;
 }
 
-.capture-options input {
-  padding: 5px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--paper);
-}
-
 .capture-options p {
   font-size: 11px;
-  color: var(--muted);
   line-height: 1.5;
   margin: 9px 0;
 }
 
 /* Recent notes stack */
-
-.recent-panel {
-  padding-top: 5px;
-}
 
 .section-heading {
   display: flex;
@@ -616,15 +445,12 @@ label {
 }
 
 .section-heading h2 {
-  font-size: 9px;
-  letter-spacing: 1.5px;
   margin: 0;
   font-weight: 600;
 }
 
 .section-heading > span {
   font-size: 10px;
-  color: var(--muted);
 }
 
 .recent-note {
@@ -633,10 +459,8 @@ label {
   width: 100%;
   text-align: left;
   background: var(--note);
-  border-radius: 2px 2px 13px 2px;
   padding: 16px 17px;
   margin-bottom: 13px;
-  box-shadow: 0 6px 14px -12px #443e29;
   transform: rotate(-1deg);
   min-height: 108px;
 }
@@ -650,7 +474,6 @@ label {
   justify-content: space-between;
   font-size: 8px;
   letter-spacing: 1px;
-  color: #58604f;
   text-transform: uppercase;
 }
 
@@ -664,7 +487,6 @@ label {
 .recent-note p {
   font-size: 10px;
   line-height: 1.6;
-  color: #515744;
   white-space: pre-line;
   margin: 0;
   overflow-wrap: anywhere;
@@ -675,10 +497,6 @@ label {
 }
 
 .recent-empty {
-  font: italic 18px/1.6 var(--typeface);
-  color: #8b917e;
-  padding: 20px 8px;
-  border: 1px dashed #c6cbb9;
   border-radius: 3px;
 }
 
@@ -693,22 +511,11 @@ label {
 
 /* Notebook toolbar and columns */
 
-.review-heading {
-  margin-bottom: 30px;
-}
-
-.review-heading h1 {
-  font-size: 48px;
-}
-
 .review-toolbar {
   display: flex;
   gap: 15px;
   align-items: center;
   flex-wrap: wrap;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  padding: 14px 0;
   margin-bottom: 28px;
 }
 
@@ -741,7 +548,6 @@ label {
 }
 
 .check-filter input {
-  accent-color: var(--green);
   min-height: 18px;
   width: 15px;
   height: 15px;
@@ -775,7 +581,6 @@ label {
 
 .column-heading span {
   font-size: 10px;
-  color: var(--muted);
 }
 
 /* Notebook cards */
@@ -783,7 +588,6 @@ label {
 .board-card {
   background: var(--note);
   padding: 18px;
-  border-radius: 3px 3px 15px 3px;
   margin-bottom: 16px;
   overflow-wrap: anywhere;
 }
@@ -850,7 +654,6 @@ label {
 
 .empty-state {
   text-align: center;
-  padding: 50px 15px;
 }
 
 .empty-state > span {
@@ -859,17 +662,14 @@ label {
 }
 
 .empty-state h2 {
-  font: 28px var(--typeface);
   margin: 15px 0;
 }
 
 .empty-state p {
   font-size: 12px;
-  color: var(--muted);
 }
 
 .due-banner {
-  background: #e5eadb;
   border: 1px solid #ccd6bf;
   border-radius: 5px;
   margin-bottom: 20px;
@@ -881,14 +681,9 @@ label {
 /* Note editor */
 
 dialog {
-  border: 1px solid var(--line);
-  background: var(--paper);
-  border-radius: 12px;
-  color: var(--ink);
   padding: 28px;
   width: min(700px,calc(100% - 30px));
   max-height: 90dvh;
-  box-shadow: 0 25px 100px #263a3430;
 }
 
 dialog::backdrop {
@@ -905,7 +700,6 @@ dialog::backdrop {
 }
 
 .dialog-heading h2 {
-  font: 29px var(--typeface);
   margin: 0;
 }
 
@@ -923,7 +717,6 @@ dialog::backdrop {
   display: grid;
   gap: 8px;
   font-size: 10px;
-  color: var(--muted);
   margin-bottom: 16px;
   font-weight: 600;
 }
@@ -934,7 +727,6 @@ dialog::backdrop {
   border: 1px solid var(--line);
   border-radius: 5px;
   padding: 8px 10px;
-  background: #fff;
   font-size: 13px;
   font-weight: 400;
 }
@@ -956,7 +748,6 @@ dialog::backdrop {
 .editor-paper {
   background: var(--note);
   padding: 12px 22px 20px;
-  border-radius: 4px 4px 18px 4px;
 }
 
 .editor-paper .field-text {
@@ -974,12 +765,10 @@ dialog::backdrop {
 
 .dialog-actions .danger {
   margin-right: auto;
-  color: #9b4b3b;
 }
 
 .editor-meta {
   font-size: 10px;
-  color: var(--muted);
   margin: 15px 0 0;
 }
 
@@ -990,10 +779,7 @@ dialog::backdrop {
   left: calc(50% + var(--sidebar)/2);
   bottom: 26px;
   transform: translate(-50%,20px);
-  background: var(--green);
-  color: white;
   box-shadow: 0 8px 30px #293e3326;
-  border-radius: 6px;
   padding: 14px 22px;
   z-index: 20;
   opacity: 0;
@@ -1020,20 +806,12 @@ dialog::backdrop {
 /* Base responsive layouts */
 
 @media (min-width: 1500px) {
-  main {
-    padding-top: 65px;
-  }
 
   .capture-pad {
     min-height: 420px;
   }
 
-  .field-text {
-    min-height: 180px;
-  }
-
   .capture-layout {
-    gap: 65px;
     grid-template-columns: minmax(0,1fr) 250px;
   }
 }
@@ -1056,7 +834,6 @@ dialog::backdrop {
   }
 
   .capture-layout {
-    gap: 28px;
     grid-template-columns: minmax(0,1fr) 175px;
   }
 
@@ -1068,16 +845,8 @@ dialog::backdrop {
     font-size: 0;
   }
 
-  .add-field span {
-    display: none;
-  }
-
   .capture-actions kbd {
     display: none;
-  }
-
-  .brand {
-    font-size: 18px;
   }
 }
 
@@ -1095,17 +864,9 @@ dialog::backdrop {
     gap: 14px;
   }
 
-  .review-heading h1 {
-    font-size: 38px;
-  }
-
   .review-heading .primary {
     white-space: nowrap;
     padding: 10px;
-  }
-
-  .prototype-tag {
-    font-size: 8px;
   }
 
   .capture-pad {
@@ -1134,16 +895,6 @@ dialog::backdrop {
     border-bottom: 1px solid var(--line);
   }
 
-  .brand {
-    font-size: 20px;
-  }
-
-  .sidebar nav {
-    margin-top: 17px;
-    display: flex;
-    gap: 4px;
-  }
-
   .sidebar nav > .nav-label,
   .nav-heading,
   #collectionNav,
@@ -1153,7 +904,6 @@ dialog::backdrop {
   }
 
   .nav-item {
-    justify-content: center;
     font-size: 11px;
     margin: 0;
     padding: 9px 7px;
@@ -1167,57 +917,25 @@ dialog::backdrop {
     width: 15px;
   }
 
-  .nav-count {
-    margin-left: 2px;
-  }
-
   .workspace {
     margin-left: 0;
   }
 
   .topbar {
-    height: 45px;
     padding: 0 20px;
     font-size: 10px;
-  }
-
-  .prototype-tag {
-    font-size: 7px;
-    letter-spacing: .6px;
-  }
-
-  .topbar span span {
-    margin: 0 5px;
   }
 
   main {
     padding: 30px 20px 0;
   }
 
-  h1 {
-    font-size: 42px;
-  }
-
-  .page-heading {
-    margin-bottom: 28px;
-  }
-
   .capture-pad {
     padding: 22px 20px;
   }
 
-  .note-title {
-    font-size: 25px;
-  }
-
   .paper-label {
     font-size: 7px;
-  }
-
-  .swatch {
-    width: 29px;
-    height: 29px;
-    min-height: 29px;
   }
 
   .swatch:before {
@@ -1226,16 +944,6 @@ dialog::backdrop {
   }
 
   .template-picker select {
-    font-size: 10px;
-    max-width: 145px;
-  }
-
-  .capture-actions {
-    align-items: center;
-    gap: 5px;
-  }
-
-  .capture-actions > .text-button {
     font-size: 10px;
   }
 
@@ -1255,10 +963,6 @@ dialog::backdrop {
     flex-wrap: wrap;
   }
 
-  .review-heading h1 {
-    font-size: 39px;
-  }
-
   .review-toolbar {
     gap: 10px;
   }
@@ -1270,10 +974,6 @@ dialog::backdrop {
   .review-toolbar select {
     flex: 1;
     min-width: 120px;
-  }
-
-  .review-toolbar > .text-button {
-    margin-left: auto;
   }
 
   .board-column {
@@ -1302,16 +1002,8 @@ dialog::backdrop {
     padding: 22px 18px;
   }
 
-  .dialog-heading h2 {
-    font-size: 25px;
-  }
-
   .toast {
     left: 50%;
-  }
-
-  .field-tools button {
-    padding: 4px 6px;
   }
 }
 
@@ -1321,11 +1013,8 @@ dialog::backdrop {
   display: flex;
   align-items: center;
   min-height: 32px;
-  color: var(--green);
   font-size: 10px;
   text-underline-offset: 4px;
-  margin-left: auto;
-  margin-right: 20px;
 }
 
 .embedded-preview .device-view-link {
@@ -1343,33 +1032,11 @@ dialog::backdrop {
   white-space: nowrap;
 }
 
-.topbar {
-  gap: 8px;
-}
-
-.field-tools button {
-  min-height: 36px;
-}
-
 /* Small-screen controls and reduced motion */
 
 @media (max-width: 620px) {
   .device-view-link {
     font-size: 9px;
-    margin: 0;
-  }
-
-  .topbar:has(.device-view-link):not(.embedded-preview .topbar) .prototype-tag {
-    display: none;
-  }
-
-  .embedded-preview .prototype-tag {
-    display: flex;
-  }
-
-  .field-tools button {
-    min-height: 44px;
-    padding: 6px 10px;
   }
 
   .swatch {
@@ -1401,9 +1068,7 @@ dialog::backdrop {
   }
 }
 
-/* Wallpaper and simple class-project styling. Keep paper controls readable. */
-
-/* Wallpaper theme: page colors */
+/* Page colors */
 
 :root {
   --desk: #0a1028;
@@ -1418,19 +1083,15 @@ dialog::backdrop {
 
 body {
   min-height: 100vh;
-  background: #0a1028 url("Wallpaper.jpg") center center/cover fixed no-repeat;
 }
 
-/* Wallpaper theme: sidebar and navigation */
+/* Sidebar and navigation */
 
 .sidebar {
-  background: #0b1029dc;
-  border-color: #ffffff30;
   padding-top: 28px;
 }
 
 .brand {
-  letter-spacing: 0;
   font-size: 21px;
 }
 
@@ -1440,27 +1101,8 @@ body {
   transform: rotate(-5deg);
 }
 
-.nav-label,
-.nav-heading {
-  color: #b5b4ca;
-}
-
 .nav-item {
   border-radius: 2px;
-}
-
-.nav-item:hover {
-  background: #ffffff16;
-}
-
-.nav-item.selected {
-  background: #b33f2a;
-  color: #fff;
-}
-
-.nav-key {
-  border-color: #ffffff50;
-  color: #fff;
 }
 
 .nav-count {
@@ -1471,34 +1113,11 @@ body {
   background: #f2b34f;
 }
 
-.sidebar-bottom {
-  color: #c7c6d3;
-}
-
 .sidebar-bottom p {
   margin-left: 0;
 }
 
-/* Wallpaper theme: workspace headings */
-
-.topbar {
-  height: 60px;
-  background: #0a1028cc;
-  color: #e0dce9;
-  border-color: #ffffff26;
-}
-
-.prototype-tag {
-  color: #c7bdd2;
-}
-
-.status-dot {
-  background: #f2b34f;
-}
-
-.device-view-link {
-  color: #ffbf86;
-}
+/* Workspace headings */
 
 main {
   padding-top: 30px;
@@ -1516,36 +1135,22 @@ h1,
   font-weight: 600;
   letter-spacing: 0;
   margin: 0;
-  color: #fff2d6;
-  text-shadow: 2px 3px #080b20;
 }
 
 .review-heading {
   margin-bottom: 24px;
 }
 
-/* Wallpaper theme: note paper and templates */
+/* Note paper and templates */
 
 .capture-layout {
   gap: 34px;
-}
-
-.template-picker {
-  color: #eee7f1;
-}
-
-.template-picker select,
-.review-toolbar select {
-  background: #181b35;
-  color: #f2eef6;
-  border-color: #777087;
 }
 
 .capture-pad,
 .editor-paper,
 .board-card,
 .recent-note {
-  color: #292a31;
   border-radius: 2px 2px 9px 2px;
   box-shadow: 4px 6px 0 #080b2070;
 }
@@ -1564,49 +1169,18 @@ h1,
 
 .note-title {
   font-family: var(--typeface);
-  font-size: 25px;
 }
 
-/* Wallpaper theme: buttons and reminder controls */
+/* Buttons and reminder controls */
 
 .primary,
-.secondary,
-.small-action {
+.secondary {
   border-radius: 2px;
   box-shadow: 2px 3px 0 #0005;
 }
 
 .primary {
-  background: #a93b24;
-  color: white;
   border: 1px solid #e3784c;
-}
-
-.primary:hover {
-  background: #8b2b1a;
-}
-
-.secondary {
-  background: #eee8dc;
-  color: #282a32;
-  border-color: #b9b0a0;
-}
-
-.text-button {
-  color: #f1d5c2;
-}
-
-.text-button:hover {
-  color: #ffd39d;
-}
-
-.capture-pad .text-button,
-.editor-paper .text-button {
-  color: #393944;
-}
-
-.capture-actions kbd {
-  color: #ddd2e3;
 }
 
 .capture-options {
@@ -1616,40 +1190,21 @@ h1,
   margin-top: 14px;
 }
 
-.capture-options input {
-  background: #f7f1e3;
-  color: #292a31;
-}
-
 .capture-options p {
   color: #d2c8d9;
 }
 
-/* Wallpaper theme: recent notes */
-
-.section-heading {
-  border-color: #ffffff50;
-}
+/* Recent notes */
 
 .section-heading h2 {
   font-size: 11px;
   letter-spacing: 0;
 }
 
-.section-heading > span {
-  color: #e2d7e8;
-}
-
 .recent-empty {
   font: 13px/1.6 var(--typeface);
-  color: #ded8e9;
   padding: 17px;
   border: 1px dashed #b2a2bf;
-  background: #0a1028a8;
-}
-
-.notebook-link {
-  border-color: #ffffff50;
 }
 
 .recent-panel {
@@ -1660,57 +1215,14 @@ h1,
   box-shadow: 3px 4px #080b2070;
 }
 
-/* Wallpaper theme: notebook and empty states */
+/* Notebook and empty states */
 
 .review-toolbar {
-  background: #0a1028d9;
   padding: 10px 12px;
   border: 1px solid #ffffff40;
 }
 
-.search-wrap input {
-  color: #fff;
-}
-
-.search-wrap input::placeholder {
-  color: #c6bfd1;
-}
-
-.column-heading {
-  color: #fff4dc;
-  text-shadow: 1px 2px #090d22;
-  border-color: #eeac61;
-}
-
-.column-heading span {
-  color: #efe3cf;
-}
-
-.board-card .card-open,
-.board-card .card-footer button {
-  color: #292a31;
-}
-
-.board-card .text-button {
-  color: #5d3126;
-}
-
-.board-card .reminder-badge {
-  color: #475b36;
-}
-
-.board-card .reminder-badge.overdue {
-  color: #9a402e;
-}
-
-.due-banner {
-  background: #f3d39c;
-  color: #442a22;
-  border-color: #9f704c;
-}
-
 .empty-state {
-  background: #0a1028c9;
   border: 1px dashed #b3a2b7;
   padding: 32px 15px;
 }
@@ -1719,21 +1231,15 @@ h1,
   font: 24px var(--typeface);
 }
 
-.empty-state p {
-  color: #d9d2e2;
-}
-
 .empty-state > span {
   display: none;
 }
 
-/* Wallpaper theme: editor and toast messages */
+/* Editor and toast messages */
 
 dialog {
-  color: #292a31;
   border: 2px solid #676171;
   border-radius: 3px;
-  background: #f7f1e3;
   box-shadow: 6px 8px 0 #070a2077;
 }
 
@@ -1741,40 +1247,16 @@ dialog {
   font: 25px var(--typeface);
 }
 
-.form-label {
-  color: #50515b;
-}
-
-.form-label input {
-  color: #292a31;
-  border-color: #b6b0aa;
-}
-
 .dialog-heading .icon-button {
-  border-color: #aca5a0;
   border-radius: 2px;
-}
-
-dialog .text-button {
-  color: #584335;
-}
-
-.dialog-actions .danger {
-  color: #9b352a;
-}
-
-.editor-meta {
-  color: #55515a;
 }
 
 .toast {
-  background: #20213a;
   border: 1px solid #e28552;
-  color: #fff;
   border-radius: 2px;
 }
 
-/* Wallpaper theme: responsive layouts */
+/* Responsive layouts */
 
 @media (min-width: 1500px) {
   main {
@@ -1784,12 +1266,7 @@ dialog .text-button {
 
 @media (max-width: 620px) {
   .sidebar {
-    background: #0b1029ed;
     padding-top: 18px;
-  }
-
-  .topbar {
-    height: 45px;
   }
 
   main {

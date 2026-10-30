@@ -6,23 +6,35 @@
     <meta name="theme-color" content="#0a1028" />
     <meta name="description" content="Noteable class project. Browser-only notes." />
     <title>Noteable</title>
+    <script src="appearance.js"></script>
     <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="reminder-picker.css" />
     <link rel="stylesheet" href="usability.css" />
+    <link rel="stylesheet" href="appearance.css" />
     <script src="reminder-picker.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
     <!-- Sidebar and navigation -->
     <aside class="sidebar">
-      <a class="brand" href="#capture" aria-label="Noteable home">
-        <span class="brand-mark" aria-hidden="true">n.</span>
-        <span>
-          Noteable
-          <small class="brand-credit">Made by KBM</small>
-        </span>
-      </a>
+      <div class="sidebar-brand-row">
+        <a class="brand" href="#capture" aria-label="Noteable home">
+          <span class="brand-mark" aria-hidden="true">n.</span>
+          <span>
+            Noteable
+            <small class="brand-credit">Made by KBM</small>
+          </span>
+        </a>
+        <label class="appearance-control">
+          Theme
+          <select data-appearance-select aria-label="Color mode">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="grayscale">Grayscale</option>
+          </select>
+        </label>
+      </div>
       <nav aria-label="Workspace">
         <p class="nav-label">WORKSPACE</p>
         <button class="nav-item selected" id="captureNav" type="button">
@@ -71,11 +83,7 @@
             Sign up
           </button>
         </div>
-        <span id="breadcrumb" class="sr-only">
-          Workspace
-          <span aria-hidden="true">/</span>
-          Quick capture
-        </span>
+        <span id="breadcrumb" class="sr-only">Workspace / Quick capture</span>
         <div class="header-tools" role="group" aria-label="Help and device views">
           <a class="device-view-link" href="preview.html">Device views ↗</a>
           <button class="text-button help-button" id="helpButton" type="button">
@@ -98,34 +106,31 @@
                 ></div>
                 <label class="template-picker">
                   Start from
-                  <select id="templateSelect" aria-label="Start from a template">
-                    <option value="">Blank note</option>
-                  </select>
+                  <select id="templateSelect" aria-label="Start from a template"></select>
                 </label>
               </div>
               <article class="capture-pad" id="capturePad">
                 <div class="pad-topline">
                   <span class="paper-label">NEW NOTE</span>
-                  <button
-                    class="reminder-toggle"
-                    id="captureOptionsButton"
-                    type="button"
-                    aria-expanded="false"
-                    aria-controls="captureOptions"
-                  >
-                    ◷ Add a reminder
-                  </button>
-                </div>
-                <div class="capture-options" id="captureOptions" hidden>
-                  <div class="reminder-field">
-                    <span>Remind me</span>
-                    <input
-                      type="datetime-local"
-                      id="draftReminder"
-                      aria-label="Capture reminder"
-                    />
+                  <div class="capture-reminder">
+                    <button
+                      class="reminder-toggle"
+                      id="captureOptionsButton"
+                      type="button"
+                      aria-expanded="false"
+                      aria-controls="captureOptions"
+                    >
+                      ◷ Remind me
+                    </button>
+                    <div class="capture-options" id="captureOptions" hidden>
+                      <input
+                        type="datetime-local"
+                        id="draftReminder"
+                        aria-label="Capture reminder"
+                      />
+                      <p>In-app alert only.</p>
+                    </div>
                   </div>
-                  <p>Alerts show while Noteable is open or when you return.</p>
                 </div>
                 <label class="sr-only" for="draftTitle">Note title, optional</label>
                 <input
@@ -196,9 +201,6 @@
               <input id="pinnedFilter" type="checkbox" />
               Pinned only
             </label>
-            <button class="text-button" id="exportButton" type="button">
-              Export notes ↓
-            </button>
           </div>
           <div id="dueBanner" class="due-banner" role="status" hidden></div>
           <div id="reviewBoard" class="review-board"></div>
@@ -323,6 +325,8 @@
           It's a section of your note. Give it a name like Questions or Tasks.
           In My notebook, sections with the same name sit in the same column.
           Pick a suggested name if you want to use one again.
+          Show related sections makes the other cards from that same note pulse together.
+          Click Stop pulse when you're done.
         </p>
       </details>
       <details>
@@ -335,8 +339,9 @@
       <details>
         <summary>How do I use a template?</summary>
         <p>
-          Cornell notes is ready when you open the app: questions on the left, notes
-          on the right, and a summary below. Start from also has To-do list and
+          Cornell notes is ready when you open the app: Notes on the left, Details
+          on the right, and Summary below. You can change any field name.
+          Start from also has To-do list and
           Class notes. Want your own setup? Open a saved note and click Save as template.
           It keeps the layout, field names, and colors, with none of your writing.
         </p>
@@ -351,9 +356,10 @@
       <details>
         <summary>How do reminders work?</summary>
         <p>
-          Click Add a reminder at the top right of your note, then pick a date and time.
+          Click Remind me above the title, then pick a date and time.
           It starts at right now, so set it to when you need a nudge. You'll see the
           reminder here while the app is open or when you come back.
+          It's a message inside the app, with no sound or system notification.
         </p>
       </details>
       <details>
@@ -376,7 +382,15 @@
         <p>
           Yes, in this browser on this device. Drafts save as you type.
           Ctrl + Enter saves a new note. When editing one, click Save changes.
-          Clearing browser data deletes your notes. Export notes doesn't do anything yet.
+          Clearing browser data deletes your notes.
+        </p>
+      </details>
+      <details>
+        <summary>Can I change how the app looks?</summary>
+        <p>
+          Pick Dark, Light, or Grayscale from Theme near the Noteable name.
+          Grayscale makes the app black and white. Your choice stays saved in this
+          browser, and switching back brings your note colors back.
         </p>
       </details>
     </dialog>

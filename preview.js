@@ -9,21 +9,18 @@
       name: 'Samsung Galaxy S26 Ultra',
       width: 412,
       height: 892,
-      detail: '6.9-inch reference · portrait',
       kind: 'phone',
     },
     laptop: {
       name: '14-inch laptop',
       width: 1440,
       height: 900,
-      detail: '16:10 workspace',
       kind: 'laptop',
     },
     monitor: {
       name: '24-inch monitor · Full HD',
       width: 1920,
       height: 1080,
-      detail: '16:9 workspace',
       kind: 'monitor',
     },
   };

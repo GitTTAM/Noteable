@@ -8,9 +8,6 @@
     "Liberation Mono",
     "Courier New",
     monospace;
-  font-family: var(--typeface);
-  color: #2c3932;
-  background: #f5f3ed;
   font-synthesis: none;
 }
 
@@ -27,7 +24,6 @@ a {
 }
 
 button,
-input,
 select {
   font: inherit;
   color: inherit;
@@ -40,7 +36,6 @@ select {
 
 button,
 a,
-input,
 select {
   min-height: 40px;
 }
@@ -66,7 +61,6 @@ select:focus-visible {
   gap: 20px;
   padding: 20px 36px;
   border-bottom: 1px solid #dcded3;
-  background: #eeeee5;
 }
 
 .preview-brand {
@@ -75,7 +69,6 @@ select:focus-visible {
   gap: 10px;
   text-decoration: none;
   font-size: 19px;
-  letter-spacing: -.6px;
   font-weight: 750;
 }
 
@@ -85,9 +78,7 @@ select:focus-visible {
   background: #e7c963;
   width: 36px;
   height: 38px;
-  border-radius: 4px 4px 12px 4px;
   font: italic 31px var(--typeface);
-  box-shadow: 2px 2px 0 #d6b852;
 }
 
 .preview-brand small {
@@ -96,20 +87,16 @@ select:focus-visible {
   font-weight: 500;
   letter-spacing: 1.8px;
   margin-top: 4px;
-  color: #6c726a;
 }
 
 .device-tabs {
   display: flex;
   gap: 4px;
-  background: #e2e5d9;
   padding: 4px;
-  border-radius: 8px;
 }
 
 .device-tabs button {
   border: 0;
-  border-radius: 5px;
   background: transparent;
   padding: 8px 19px;
   font-size: 12px;
@@ -122,16 +109,10 @@ select:focus-visible {
   font-size: 20px;
 }
 
-.device-tabs button[aria-pressed=true] {
-  background: #fffef9;
-  box-shadow: 0 2px 4px #35433312;
-}
-
 .unframed-link {
   display: flex;
   align-items: center;
   font-size: 11px;
-  color: #59634f;
   text-underline-offset: 4px;
 }
 
@@ -140,7 +121,6 @@ select:focus-visible {
 main {
   max-width: 1800px;
   padding: 30px 42px 0;
-  margin: auto;
 }
 
 .studio-heading {
@@ -148,18 +128,11 @@ main {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  margin-bottom: 23px;
 }
 
 h1 {
   font: 32px/1.2 var(--typeface);
-  letter-spacing: -.8px;
   margin: 0;
-}
-
-h1 em {
-  color: #768366;
-  font-weight: 400;
 }
 
 .preview-controls {
@@ -168,8 +141,6 @@ h1 em {
   flex-wrap: wrap;
   gap: 15px;
   border: 1px solid #dcded3;
-  border-radius: 7px;
-  background: #eeeee57a;
   padding: 11px 15px;
   margin-bottom: 20px;
 }
@@ -179,21 +150,13 @@ h1 em {
   align-items: center;
   gap: 8px;
   font-size: 10px;
-  color: #687060;
 }
 
-.preview-controls select,
-.preview-controls input {
-  background: #fffef9;
+.preview-controls select {
   border: 1px solid #d8ddce;
-  border-radius: 4px;
   font-size: 11px;
   padding: 6px 9px;
   min-height: 34px;
-}
-
-.preview-controls input {
-  width: 76px;
 }
 
 .preview-controls select {
@@ -206,20 +169,14 @@ h1 em {
 
 #screenReadout {
   font-size: 10px;
-  color: #6c726a;
   font-variant-numeric: tabular-nums;
 }
 
 /* Preview stage and shared device frame */
 
 .preview-stage {
-  height: clamp(450px,calc(100dvh - 350px),1100px);
   min-width: 0;
-  background-color: #e8eadf;
-  background-image: radial-gradient(#9ba88c42 .7px,transparent .7px);
-  background-size: 14px 14px;
   border: 1px solid #d9dfcd;
-  border-radius: 10px;
   overflow: auto;
   padding: 25px 35px;
   position: relative;
@@ -444,13 +401,8 @@ h1 em {
     margin-left: 0;
   }
 
-  h1 {
-    font-size: 28px;
-  }
-
   .preview-stage {
     padding: 20px;
-    min-height: 450px;
   }
 }
 
@@ -479,18 +431,6 @@ h1 em {
     margin-left: auto;
   }
 
-  .studio-heading {
-    margin-bottom: 18px;
-  }
-
-  h1 {
-    font-size: 27px;
-  }
-
-  h1 em {
-    display: block;
-  }
-
   main {
     padding: 23px 14px 0;
   }
@@ -498,11 +438,6 @@ h1 em {
   .preview-controls {
     padding: 11px;
     gap: 10px;
-  }
-
-  .preview-controls > label:first-child {
-    flex-basis: 100%;
-    justify-content: space-between;
   }
 
   .preview-controls select {
@@ -519,8 +454,6 @@ h1 em {
 
   .preview-stage {
     padding: 18px 12px;
-    height: 540px;
-    min-height: 0;
   }
 }
 
@@ -530,28 +463,12 @@ h1 em {
   }
 }
 
-/* Match the class prototype without altering device sizing. */
-
-/* Wallpaper theme: page and header */
+/* Page and header */
 
 :root {
   background: #0a1028;
   color: #efedf5;
   font-family: var(--typeface);
-}
-
-body {
-  min-height: 100vh;
-  background: #0a1028 url("Wallpaper.jpg") center center/cover fixed no-repeat;
-}
-
-.preview-header {
-  background: #0b1029e8;
-  border-color: #ffffff30;
-}
-
-.preview-brand {
-  letter-spacing: 0;
 }
 
 .brand-mark {
@@ -560,17 +477,11 @@ body {
   box-shadow: 2px 3px #0008;
 }
 
-.preview-brand small {
-  color: #c4b9d1;
-}
-
 .device-tabs {
   border-radius: 2px;
-  background: #ffffff15;
 }
 
 .device-tabs button {
-  color: #eee5f4;
   border-radius: 2px;
 }
 
@@ -580,11 +491,7 @@ body {
   box-shadow: 2px 2px #080b2077;
 }
 
-.unframed-link {
-  color: #ffd19d;
-}
-
-/* Wallpaper theme: heading and screen controls */
+/* Heading and screen controls */
 
 .studio-heading {
   margin-bottom: 20px;
@@ -593,33 +500,17 @@ body {
 h1 {
   font-family: var(--typeface);
   font-size: 28px;
-  color: #fff2d6;
-  letter-spacing: 0;
-  text-shadow: 2px 3px #080b20;
 }
 
 .preview-controls {
-  background: #0b1029e6;
-  border-color: #ffffff40;
   border-radius: 2px;
 }
 
-.preview-controls label,
-#screenReadout {
-  color: #e3d9ed;
-}
-
-.preview-controls input,
 .preview-controls select {
-  background: #191d35;
-  color: #f5eff8;
-  border-color: #71667d;
   border-radius: 2px;
 }
 
 .preview-stage {
-  background: transparent;
-  border-color: #ffffff35;
   border-radius: 2px;
 }
 
@@ -631,24 +522,15 @@ h1 {
 }
 
 h1,
-h2,
-h3,
-.note-title,
-.preview-brand,
-.brand {
+.preview-brand {
   font-style: normal;
   letter-spacing: 0;
-}
-
-kbd {
-  font-family: var(--typeface);
 }
 
 /* Device labels and small-screen tabs */
 
 .screen-label {
   font-size: 11px;
-  color: #e3d9ed;
 }
 
 .preview-controls {
@@ -670,8 +552,6 @@ kbd {
     flex-basis: 100%;
   }
 }
-
-/* Let the device preview use the remaining window height. */
 
 /* Preview stage fills the remaining window height */
 

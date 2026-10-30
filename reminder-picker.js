@@ -43,7 +43,7 @@
     clearButton.className = 'clear-reminder';
     wrapper.append(dateButton, timeButton, clearButton);
     input.after(wrapper);
-    const calendar = make('div', 'reminder-popup calendar-popup');
+    const calendar = make('div', 'reminder-popup');
     const time = make('div', 'reminder-popup time-popup');
     calendar.id = `${input.id}Calendar`;
     time.id = `${input.id}Time`;
@@ -87,8 +87,22 @@
       [dateButton, calendar],
       [timeButton, time],
     ].forEach(([trigger, popup]) => {
+      let pointerFocus = false;
+      trigger.addEventListener('pointerdown', () => {
+        pointerFocus = true;
+      });
+      trigger.addEventListener('blur', () => {
+        pointerFocus = false;
+      });
       trigger.addEventListener('focus', (event) => {
-        if (!returningFocus && !popup.contains(event.relatedTarget)) open(popup, trigger);
+        const fromPointer = pointerFocus;
+        pointerFocus = false;
+        if (!fromPointer && !returningFocus && !popup.contains(event.relatedTarget)) {
+          // Finish focusing the field before moving keyboard focus into its popup.
+          queueMicrotask(() => {
+            if (document.activeElement === trigger) open(popup, trigger);
+          });
+        }
       });
     });
 
@@ -123,7 +137,6 @@
       clearButton.hidden = !value;
     }
     function changed() {
-      sync();
       input.dispatchEvent(new Event('change', { bubbles: true }));
     }
     function saveDate(date) {
@@ -288,7 +301,10 @@
     }
     function position(popup, trigger) {
       const rect = trigger.getBoundingClientRect();
-      const left = Math.max(8, Math.min(rect.left, innerWidth - popup.offsetWidth - 8));
+      const left = Math.max(
+        8,
+        Math.min(rect.right - popup.offsetWidth, innerWidth - popup.offsetWidth - 8),
+      );
       const top =
         rect.bottom + popup.offsetHeight + 8 <= innerHeight
           ? rect.bottom + 5
@@ -297,15 +313,17 @@
       popup.style.top = `${top}px`;
     }
 
-    // Resize, dialog closing, and field updates
-    window.addEventListener('resize', () => {
+    // Scrolling, resizing, dialog closing, and field updates
+    function repositionOpen() {
       [
         [calendar, dateButton],
         [time, timeButton],
       ].forEach(([popup, trigger]) => {
         if (popup.matches(':popover-open')) position(popup, trigger);
       });
-    });
+    }
+    window.addEventListener('resize', repositionOpen);
+    document.addEventListener('scroll', repositionOpen, true);
     input.closest('dialog')?.addEventListener('close', () => {
       returningFocus = true;
       calendar.hidePopover();

@@ -1,0 +1,410 @@
+/* Display colors. Note palettes stay saved separately. */
+:root {
+  color-scheme: dark;
+  --ui-bg: #0a1028;
+  --ui-surface: #0d1428;
+  --ui-control: #1a233a;
+  --ui-ink: #f0edf5;
+  --ui-muted: #c2bdd0;
+  --ui-line: #677085;
+  --ui-accent: #ffca96;
+  --ui-button: #a93b24;
+  --ui-button-ink: #fff;
+  --ui-hover: #ffffff18;
+  --field-bg: #171e2a;
+  --field-ink: #f0f1f5;
+  --field-border: #a1a6b0;
+  --field-placeholder: #b2b8c4;
+  --pulse-color: #7eefff;
+  --pulse-glow: #46d7ef66;
+}
+
+:root[data-appearance='light'] {
+  color-scheme: light;
+  --ui-bg: #efeee7;
+  --ui-surface: #fffdf7;
+  --ui-control: #fff;
+  --ui-ink: #20232b;
+  --ui-muted: #555968;
+  --ui-line: #9298a0;
+  --ui-accent: #8d2d1d;
+  --ui-button: #a33420;
+  --ui-hover: #10101010;
+  --field-bg: #fffdf5;
+  --field-ink: #202027;
+  --field-border: #746d62;
+  --field-placeholder: #6f6a61;
+  --pulse-color: #00657d;
+  --pulse-glow: #007a9955;
+}
+
+:root[data-appearance='grayscale'] {
+  color-scheme: light;
+  --ui-bg: #e7e7e7;
+  --ui-surface: #f7f7f7;
+  --ui-control: #fff;
+  --ui-ink: #191919;
+  --ui-muted: #525252;
+  --ui-line: #777;
+  --ui-accent: #292929;
+  --ui-button: #333;
+  --ui-hover: #00000010;
+  --field-bg: #fff;
+  --field-ink: #171717;
+  --field-border: #777;
+  --field-placeholder: #666;
+  --pulse-color: #161616;
+  --pulse-glow: #00000055;
+}
+
+:root[data-appearance] {
+  --desk: var(--ui-bg);
+  --paper: var(--ui-surface);
+  --ink: var(--ui-ink);
+  --muted: var(--ui-muted);
+  --line: var(--ui-line);
+  --green: var(--ui-button);
+  background: var(--ui-bg);
+  color: var(--ui-ink);
+}
+
+body {
+  background: var(--ui-bg);
+}
+
+/* Theme chooser stays beside the brand on phones. */
+.sidebar-brand-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sidebar nav {
+  margin-top: 30px;
+}
+
+.appearance-control {
+  display: grid;
+  gap: 4px;
+  color: var(--ui-muted);
+  font-size: 9px;
+}
+
+.appearance-control select {
+  width: 116px;
+  min-height: 34px;
+  font-size: 10px;
+}
+
+/* Navigation, headers, and controls */
+.sidebar,
+.topbar,
+.review-toolbar,
+.preview-header,
+.preview-controls,
+.preview-stage {
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+  border-color: var(--ui-line);
+}
+
+.brand,
+h1,
+.review-heading h1,
+.column-heading {
+  color: var(--ui-ink);
+  text-shadow: none;
+}
+
+.nav-label,
+.nav-heading,
+.sidebar-bottom,
+.brand-credit,
+.brand .brand-credit,
+.preview-brand small,
+.preview-brand .brand-credit,
+.template-picker,
+.section-heading > span,
+.column-heading span {
+  color: var(--ui-muted);
+}
+
+.nav-item:hover {
+  background: var(--ui-hover);
+}
+
+.nav-item.selected {
+  background: var(--ui-button);
+  color: var(--ui-button-ink);
+}
+
+.nav-key {
+  color: inherit;
+  border-color: currentColor;
+}
+
+.section-heading,
+.column-heading,
+.notebook-link {
+  border-color: var(--ui-line);
+}
+
+.device-view-link,
+.unframed-link,
+.text-button,
+.text-button:hover,
+.account-button,
+.help-button {
+  color: var(--ui-accent);
+}
+
+.account-button,
+.help-button {
+  border-color: var(--ui-line);
+}
+
+.signup-button,
+.signup-button:hover {
+  color: #171717;
+}
+
+select,
+.template-picker select,
+.review-toolbar select,
+.preview-controls select,
+.time-selects select,
+.reminder-picker > button,
+dialog .reminder-picker > button {
+  background: var(--ui-control);
+  color: var(--ui-ink);
+  border-color: var(--ui-line);
+}
+
+.search-wrap input {
+  color: var(--ui-ink);
+}
+
+.search-wrap input::placeholder {
+  color: var(--ui-muted);
+}
+
+.primary,
+.primary:hover {
+  background: var(--ui-button);
+  color: var(--ui-button-ink);
+  border-color: var(--ui-accent);
+}
+
+.secondary {
+  background: var(--ui-control);
+  color: var(--ui-ink);
+  border-color: var(--ui-line);
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+canvas:focus-visible {
+  outline-color: var(--ui-accent);
+}
+
+/* Writing surfaces follow the selected mode. */
+.note-title,
+.field-name,
+.field-text,
+.form-label input {
+  background: var(--field-bg);
+  color: var(--field-ink);
+  border-color: var(--field-border);
+}
+
+.note-title::placeholder,
+.field-text::placeholder {
+  color: var(--field-placeholder);
+  opacity: 1;
+}
+
+.field-tools button[aria-pressed='true'],
+.field-tools button:hover,
+.reminder-toggle.has-reminder,
+.reminder-toggle:hover,
+.add-field {
+  background: var(--field-bg);
+  color: var(--field-ink);
+}
+
+.swatch[aria-pressed='true'] {
+  border-color: var(--ui-ink);
+}
+
+.capture-actions kbd,
+.draft-status {
+  color: var(--ui-muted);
+}
+
+/* Dialogs, reminders, and status messages */
+dialog,
+.reminder-popup,
+.recent-empty,
+.empty-state {
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+  border-color: var(--ui-line);
+}
+
+.form-label,
+.editor-meta,
+#helpDialog p,
+.empty-state p,
+.calendar-days .weekday,
+.calendar-days .other-month,
+.time-selects label {
+  color: var(--ui-muted);
+}
+
+dialog .text-button,
+.dialog-actions .danger,
+.picker-footer button {
+  color: var(--ui-accent);
+}
+
+.dialog-heading .icon-button {
+  border-color: var(--ui-line);
+}
+
+.calendar-days button.selected {
+  background: var(--ui-button);
+  color: var(--ui-button-ink);
+}
+
+.calendar-days button[aria-current='date'],
+.reminder-popup button:focus-visible,
+.time-selects select:focus-visible {
+  outline-color: var(--ui-accent);
+}
+
+.reminder-popup button:hover {
+  background: var(--ui-hover);
+}
+
+.picker-footer {
+  border-color: var(--ui-line);
+}
+
+.due-banner,
+.toast {
+  background: var(--ui-button);
+  color: var(--ui-button-ink);
+  border-color: var(--ui-line);
+}
+
+.toast-action {
+  color: var(--ui-button-ink);
+  border-color: currentColor;
+}
+
+.check-filter input {
+  accent-color: var(--ui-button);
+}
+
+/* Related sections share a slow colored pulse. */
+.board-card.related-card {
+  box-shadow: 0 0 0 2px var(--pulse-color);
+  animation: related-pulse 2s ease-in-out infinite;
+}
+
+@keyframes related-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px var(--pulse-color), 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--pulse-color), 0 0 14px 3px var(--pulse-glow);
+  }
+}
+
+/* The outer device preview follows the app's mode. */
+.device-tabs {
+  background: var(--ui-control);
+}
+
+.device-tabs button {
+  color: var(--ui-ink);
+}
+
+.device-tabs button[aria-pressed='true'] {
+  background: var(--ui-button);
+  color: var(--ui-button-ink);
+}
+
+.screen-label,
+#screenReadout,
+.zoom-control {
+  color: var(--ui-ink);
+}
+
+.preview-controls label {
+  color: var(--ui-muted);
+}
+
+/* Grayscale changes the display without rewriting any note colors. */
+/* Filter individual surfaces so fixed controls keep their viewport position. */
+html[data-appearance='grayscale'] :is(
+  .sidebar, .topbar, main, .preview-header, dialog, .toast, .reminder-popup
+) {
+  filter: grayscale(1);
+}
+
+html[data-appearance='grayscale'] :is(.capture-pad, .editor-paper, .board-card, .recent-note) {
+  --note: #f5f5f5 !important;
+  --note-accent: #292929 !important;
+  --note-ink: #171717 !important;
+  box-shadow: 4px 6px 0 #00000055;
+}
+
+html[data-appearance='grayscale'] .capture-pad {
+  background-image: repeating-linear-gradient(
+    transparent 0, transparent 29px, #00000010 29px, #00000010 30px
+  );
+}
+
+html[data-appearance='grayscale'] input:focus,
+html[data-appearance='grayscale'] textarea:focus {
+  border-color: #171717;
+}
+
+html[data-appearance='grayscale'] :is(dialog, .toast, .reminder-popup) {
+  box-shadow: 3px 5px 15px #00000066;
+}
+
+html[data-appearance='grayscale'] :is(.brand-mark, .signup-button, .collection-dot) {
+  background: #d0d0d0;
+  color: #171717;
+}
+
+html[data-appearance='grayscale'] :is(.drawing, .card-open img, .device-frame),
+html[data-appearance='grayscale'] .swatch::before {
+  filter: grayscale(1);
+}
+
+html[data-appearance='grayscale'] .drawing,
+html[data-appearance='grayscale'] .card-open img {
+  background: #fff;
+}
+
+@media (max-width: 620px) {
+  .sidebar-brand-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .sidebar nav {
+    margin-top: 17px;
+  }
+
+  .appearance-control select {
+    width: 104px;
+  }
+}

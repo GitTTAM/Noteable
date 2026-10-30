@@ -4,12 +4,11 @@
   if (window.self !== window.top)
     document.documentElement.classList.add('embedded-preview');
 
-  // Storage keys and note colors
+  // Browser storage and note colors
   const KEYS = {
-    notes: 'stickyNotesPrototype.notes',
-    draft: 'stickyNotesPrototype.draftV2',
-    legacyDraft: 'stickyNotesPrototype.draft',
-    templates: 'stickyNotesPrototype.templates',
+    notes: 'noteable.notes',
+    draft: 'noteable.draft',
+    templates: 'noteable.templates',
   };
   const COLORS = [
     ['Black & Yellow', '#ffe600', '#111111', '#171717'],
@@ -19,25 +18,11 @@
     ['Graphite & Lime', '#363636', '#c8ec00', '#ffffff'],
     ['Black & Orange', '#ff9900', '#111111', '#171717'],
   ];
-  const LEGACY_COLORS = [
-    '#f5df87',
-    '#d9cfee',
-    '#c8dce9',
-    '#efc8c6',
-    '#d7dfbe',
-    '#f1d1ad',
-    '#ffe16a',
-    '#a9dbe8',
-    '#f5aabd',
-    '#c7e59b',
-    '#c8b2ec',
-    '#ffc28f',
-  ];
   const builtins = [
     {
       id: 'cornell',
       name: 'Cornell notes',
-      labels: ['Cues', 'Notes', 'Summary'],
+      labels: ['Notes', 'Details', 'Summary'],
       slots: ['cues', 'notes', 'summary'],
       layout: 'cornell',
       color: COLORS[0][1],
@@ -69,14 +54,11 @@
   const validDate = (value) =>
     typeof value === 'string' && Number.isFinite(Date.parse(value));
   const colorValue = (value) =>
-    COLORS.some((c) => c[1] === value) || LEGACY_COLORS.includes(value)
-      ? value
-      : COLORS[0][1];
+    COLORS.some((c) => c[1] === value) ? value : COLORS[0][1];
   const fieldSlot = (value) =>
     ['cues', 'notes', 'summary'].includes(value) ? value : '';
   const noteLayout = (value) => (value === 'cornell' ? 'cornell' : 'stacked');
   const blankField = (label = 'Notes', slot = '') => ({
-    id: makeId(),
     label,
     text: '',
     mode: 'text',
@@ -117,12 +99,11 @@
   function saveNoteLists(nextNotes, nextTrash = trash) {
     return write(KEYS.notes, [...nextNotes, ...nextTrash]);
   }
-  function normalizeFields(raw, fallback = '') {
-    if (!Array.isArray(raw) || !raw.length) return [{ ...blankField(), text: fallback }];
-    return raw
+  function normalizeFields(raw) {
+    if (!Array.isArray(raw)) return [blankField()];
+    const fields = raw
       .filter((f) => f && typeof f === 'object')
       .map((f) => ({
-        id: makeId(),
         label: typeof f.label === 'string' ? f.label.slice(0, 60) : 'Notes',
         text: typeof f.text === 'string' ? f.text : '',
         mode: f.mode === 'draw' ? 'draw' : 'text',
@@ -141,19 +122,15 @@
               .filter((s) => s.length)
           : [],
       }));
+    return fields.length ? fields : [blankField()];
   }
   function normalizeNote(raw, index) {
     if (!raw || typeof raw !== 'object') return null;
     const now = new Date().toISOString();
-    const fields = normalizeFields(
-      raw.fields,
-      typeof raw.text === 'string' ? raw.text : '',
-    );
     return {
       id: typeof raw.id === 'string' && raw.id ? raw.id : makeId(),
       title: typeof raw.title === 'string' ? raw.title.slice(0, 160) : '',
-      fields: fields.length ? fields : [blankField()],
-      text: typeof raw.text === 'string' ? raw.text : '',
+      fields: normalizeFields(raw.fields),
       color: colorValue(raw.color),
       category: cleanCollection(raw.category),
       pinned: Boolean(raw.pinned),
@@ -187,18 +164,6 @@
       layout: noteLayout(storedDraft.layout),
       fields: normalizeFields(storedDraft.fields),
     };
-    if (!draft.fields.length) draft.fields = [blankField()];
-  } else {
-    try {
-      const legacyText = localStorage.getItem(KEYS.legacyDraft) || '';
-      if (legacyText) {
-        draft.fields = [{ ...blankField(), text: legacyText }];
-        draft.layout = 'stacked';
-        draft.templateId = '';
-      }
-    } catch {
-      storageWarning = true;
-    }
   }
 
   // Built-in and saved templates
@@ -217,32 +182,11 @@
   // Current view and editor state
   let editor = null;
   let view = 'capture';
+  let relatedNoteId = null;
   let toastTimer;
   const announcedReminders = new Set();
   const hasContent = (note) =>
     note.fields.some((f) => f.text.trim() || f.strokes.some((s) => s.length));
-  // Give an old empty capture the new default without replacing unfinished work.
-  if (
-    !draft.templateId &&
-    !hasContent(draft) &&
-    !draft.title.trim() &&
-    !draft.reminderAt &&
-    ((draft.fields.length === 1 && draft.fields[0].label === 'Notes') ||
-      (draft.layout === 'cornell' &&
-        draft.fields.length === 3 &&
-        builtins[0].labels.every((label, index) => label === draft.fields[index].label)))
-  ) {
-    draft = blankDraft();
-  }
-  if (!draft.templateId) {
-    const matchingTemplate = [...builtins, ...templates].find(
-      (template) =>
-        noteLayout(template.layout) === draft.layout &&
-        template.labels.length === draft.fields.length &&
-        template.labels.every((label, index) => label === draft.fields[index].label),
-    );
-    draft.templateId = matchingTemplate?.id || '';
-  }
   const titleOf = (note) =>
     note.title.trim() ||
     note.fields
@@ -314,7 +258,7 @@
   function updateReminderButton() {
     $('captureOptionsButton').textContent = draft.reminderAt
       ? '◷ Edit reminder'
-      : '◷ Add a reminder';
+      : '◷ Remind me';
     $('captureOptionsButton').classList.toggle('has-reminder', Boolean(draft.reminderAt));
     if (draft.reminderAt)
       $('captureOptionsButton').title = reminderLabel(draft.reminderAt);
@@ -322,10 +266,7 @@
   }
   function paintColors(container, model, changed) {
     container.replaceChildren();
-    const choices = COLORS.some((c) => c[1] === model.color)
-      ? COLORS
-      : [...COLORS, ['Original', model.color, '#554a36']];
-    choices.forEach(([name, color, accent]) => {
+    COLORS.forEach(([name, color, accent]) => {
       const el = button('', 'swatch', () => {
         model.color = color;
         paintColors(container, model, changed);
@@ -340,10 +281,10 @@
     });
   }
   function paintNote(element, color) {
-    const theme = COLORS.find((choice) => choice[1] === color);
-    element.style.setProperty('--note', color);
-    element.style.setProperty('--note-accent', theme?.[2] || '#554a36');
-    element.style.setProperty('--note-ink', theme?.[3] || '#292a31');
+    const theme = COLORS.find((choice) => choice[1] === color) || COLORS[0];
+    element.style.setProperty('--note', theme[1]);
+    element.style.setProperty('--note-accent', theme[2]);
+    element.style.setProperty('--note-ink', theme[3]);
   }
   function renderCapture() {
     $('draftTitle').value = draft.title;
@@ -399,33 +340,34 @@
       textButton.setAttribute('aria-pressed', String(field.mode === 'text'));
       drawButton.setAttribute('aria-pressed', String(field.mode === 'draw'));
       tools.append(textButton, drawButton);
-      if (model.fields.length > 1)
-        tools.append(
-          button('×', '', () => {
-            if (
-              (field.text || field.strokes.length) &&
-              !confirm('Remove this field and its content?')
-            )
-              return;
-            model.fields.splice(index, 1);
-            changed();
-            renderFields(container, model, changed);
-          }),
-        );
-      if (model.fields.length > 1)
-        tools.lastChild.setAttribute('aria-label', `Remove field ${index + 1}`);
+      if (model.fields.length > 1) {
+        const remove = button('×', '', () => {
+          if (
+            (field.text || field.strokes.length) &&
+            !confirm('Remove this field and its content?')
+          )
+            return;
+          model.fields.splice(index, 1);
+          changed();
+          renderFields(container, model, changed);
+        });
+        remove.setAttribute('aria-label', `Remove field ${index + 1}`);
+        tools.append(remove);
+      }
       head.append(tools);
       section.append(head);
       const textarea = node('textarea', 'field-text');
       textarea.value = field.text;
       textarea.placeholder =
         field.slot === 'cues'
-          ? 'Questions or key words…'
+          ? 'Write a note…'
           : field.slot === 'summary'
             ? 'Sum up the main idea…'
-            : index
-              ? 'Write here…'
-              : 'Write a note…';
+            : model.layout === 'cornell' && field.slot === 'notes'
+              ? 'Add details…'
+              : index
+                ? 'Write here…'
+                : 'Write a note…';
       textarea.setAttribute('aria-label', `Field ${index + 1} text`);
       textarea.addEventListener('input', () => {
         field.text = textarea.value;
@@ -556,7 +498,11 @@
     if (!hasContent(draft)) return;
     const now = new Date().toISOString();
     const note = {
-      ...copy(draft),
+      title: draft.title,
+      color: draft.color,
+      reminderAt: draft.reminderAt,
+      layout: draft.layout,
+      fields: copy(draft.fields),
       id: makeId(),
       category: 'Inbox',
       pinned: false,
@@ -568,13 +514,11 @@
     note.fields.forEach((f) => {
       f.label = f.label.trim() || 'Notes';
     });
-    note.text = note.fields.map((f) => f.text).join('\n\n');
     if (!saveNoteLists([...notes, note])) return;
     notes.push(note);
     draft = blankDraft();
-    // Clear the legacy draft only after the new note was safely written.
+    // Clear the draft only after the new note was safely written.
     try {
-      localStorage.removeItem(KEYS.legacyDraft);
       localStorage.removeItem(KEYS.draft);
     } catch {
       // Saved note remains available.
@@ -675,6 +619,7 @@
   // Switch views and build the notebook
   function showView(next) {
     view = next;
+    relatedNoteId = null;
     const capture = next === 'capture';
     $('captureView').hidden = !capture;
     $('reviewView').hidden = capture;
@@ -695,7 +640,6 @@
     $('collectionFilter').hidden = next === 'trash';
     document.querySelector('label[for="collectionFilter"]').hidden = next === 'trash';
     $('pinnedFilter').closest('label').hidden = next === 'trash';
-    $('exportButton').hidden = next === 'trash';
     renderNavigation();
     renderRecent();
     if (!capture) renderBoard();
@@ -728,10 +672,10 @@
     );
     const columns = new Map();
     matches.forEach((note) =>
-      note.fields.forEach((field, i) => {
+      note.fields.forEach((field) => {
         const label = field.label.trim() || 'Notes';
         if (!columns.has(label)) columns.set(label, []);
-        columns.get(label).push({ note, field, index: i });
+        columns.get(label).push({ note, field });
       }),
     );
     $('reviewBoard').replaceChildren();
@@ -740,11 +684,10 @@
       const heading = node('h2', 'column-heading', label);
       heading.append(node('span', '', String(entries.length).padStart(2, '0')));
       column.append(heading);
-      entries.forEach(({ note, field, index }) =>
-        column.append(renderCard(note, field, index)),
-      );
+      entries.forEach(({ note, field }) => column.append(renderCard(note, field)));
       $('reviewBoard').append(column);
     });
+    renderRelatedCards();
     $('reviewEmpty').hidden = matches.length > 0;
     $('emptyMessage').textContent = !notes.length
       ? 'Save a note to get started.'
@@ -756,8 +699,9 @@
     $('dueBanner').textContent =
       `${overdue} ${overdue === 1 ? 'reminder needs' : 'reminders need'} your attention. Open a note to reschedule, or mark its reminder done.`;
   }
-  function renderCard(note, field, index) {
+  function renderCard(note, field) {
     const card = node('article', 'board-card');
+    card.dataset.noteId = note.id;
     paintNote(card, note.color);
     const meta = node('div', 'card-meta');
     meta.append(
@@ -800,8 +744,16 @@
       );
     }
     const footer = node('div', 'card-footer');
-    footer.append(node('span', '', `${index + 1} / ${note.fields.length} fields`));
-    const actions = node('div');
+    if (note.fields.length > 1) {
+      const related = button('Show related sections', 'related-button', () => {
+        relatedNoteId = relatedNoteId === note.id ? null : note.id;
+        renderRelatedCards();
+      });
+      related.setAttribute('aria-pressed', 'false');
+      related.setAttribute('aria-controls', 'reviewBoard');
+      footer.append(related);
+    }
+    const actions = node('div', 'card-actions');
     actions.append(
       button(note.pinned ? 'Unpin' : 'Pin', '', () =>
         updateNote(note.id, (n) => {
@@ -813,6 +765,27 @@
     footer.append(actions);
     card.append(footer);
     return card;
+  }
+
+  // Related cards share a saved note ID, even when titles or colors match others.
+  function renderRelatedCards() {
+    const cards = [...$('reviewBoard').querySelectorAll('.board-card[data-note-id]')];
+    const selected = notes.find(
+      (note) =>
+        note.id === relatedNoteId &&
+        note.fields.length > 1 &&
+        cards.some((card) => card.dataset.noteId === note.id),
+    );
+    if (!selected) relatedNoteId = null;
+    cards.forEach((card) => {
+      const related = card.dataset.noteId === relatedNoteId;
+      card.classList.toggle('related-card', related);
+      const control = card.querySelector('.related-button');
+      if (control) {
+        control.textContent = related ? 'Stop pulse' : 'Show related sections';
+        control.setAttribute('aria-pressed', String(related));
+      }
+    });
   }
 
   // Update notes and open the editor
@@ -863,6 +836,7 @@
     toast('Note restored.');
   }
   function renderTrash() {
+    relatedNoteId = null;
     const query = $('searchInput').value.trim().toLocaleLowerCase();
     const matches = trash
       .filter((note) =>
@@ -884,7 +858,7 @@
       ? 'No deleted notes. Notes you delete can be restored here.'
       : 'No deleted notes match this search.';
     matches.forEach((note) => {
-      const card = node('article', 'board-card deleted-note');
+      const card = node('article', 'board-card');
       paintNote(card, note.color);
       card.append(
         node('p', 'card-meta', `Deleted ${reminderLabel(note.deletedAt)}`),
@@ -936,7 +910,6 @@
     editor.fields.forEach((f) => {
       f.label = f.label.trim() || 'Notes';
     });
-    editor.text = editor.fields.map((f) => f.text).join('\n\n');
     return editor;
   }
 
@@ -1027,7 +1000,6 @@
     const expanded = $('captureOptions').hidden;
     $('captureOptions').hidden = !expanded;
     $('captureOptionsButton').setAttribute('aria-expanded', String(expanded));
-    if (expanded) $('draftReminder').nextElementSibling.querySelector('button').focus();
   });
   $('saveCapture').addEventListener('click', saveCapture);
   $('addCaptureField').addEventListener('click', () =>

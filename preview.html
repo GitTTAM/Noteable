@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0a1028" />
     <title>Noteable · Device views</title>
+    <script src="appearance.js"></script>
     <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="preview.css" />
+    <link rel="stylesheet" href="appearance.css" />
     <script src="preview.js" defer></script>
   </head>
   <body>
@@ -42,6 +44,14 @@
       <!-- Screen label and preview scale -->
       <section class="preview-controls" aria-label="Screen settings">
         <span id="screenLabel" class="screen-label">14-inch laptop</span>
+        <label class="appearance-control">
+          Theme
+          <select data-appearance-select aria-label="Color mode">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="grayscale">Grayscale</option>
+          </select>
+        </label>
         <label class="zoom-control">
           Preview
           <select id="zoomMode">
@@ -69,7 +79,7 @@
             <iframe
               id="appPreview"
               title="Noteable interactive 14-inch laptop preview"
-              src="index.html?embedded=1"
+              src="index.html"
             ></iframe>
             <div class="phone-gesture" aria-hidden="true"></div>
             <div class="device-chin" aria-hidden="true">NOTEABLE</div>
