@@ -3,6 +3,13 @@ body {
   background-image: linear-gradient(#080d25b8, #080d25b8), url('Wallpaper.jpg');
 }
 
+/* Text fields keep one border when focused. */
+input:not([type='checkbox']):not([type='radio']):focus,
+textarea:focus {
+  outline: none;
+  border-color: #202027;
+}
+
 /* Bold color pairs follow each note through the app */
 .capture-pad,
 .editor-paper,
