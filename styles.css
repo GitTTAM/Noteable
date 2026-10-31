@@ -1156,7 +1156,6 @@ h1,
 }
 
 .capture-pad {
-  transform: rotate(-.3deg);
   background-image: repeating-linear-gradient(transparent 0,transparent 29px,#3a322010 29px,#3a322010 30px);
   padding-bottom: 24px;
 }

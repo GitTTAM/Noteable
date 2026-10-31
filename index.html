@@ -84,7 +84,10 @@
           </button>
         </div>
         <span id="breadcrumb" class="sr-only">Workspace / Quick capture</span>
-        <div class="header-tools" role="group" aria-label="Help and device views">
+        <div class="header-tools" role="group" aria-label="Backup, help and device views">
+          <button class="text-button help-button" id="backupButton" type="button">
+            Backup
+          </button>
           <a class="device-view-link" href="preview.html">Device views ↗</a>
           <button class="text-button help-button" id="helpButton" type="button">
             Help / FAQ
@@ -140,6 +143,16 @@
                   maxlength="160"
                   autocomplete="off"
                 />
+                <label class="form-label capture-collection">
+                  Collection
+                  <input
+                    id="draftCollection"
+                    list="collectionOptions"
+                    maxlength="40"
+                    placeholder="Inbox"
+                    autocomplete="off"
+                  />
+                </label>
                 <p class="field-guide" id="fieldGuide">
                   Change a field name to choose its notebook column. Reuse a name to group
                   notes together.
@@ -197,6 +210,14 @@
             <select id="collectionFilter">
               <option value="">All collections</option>
             </select>
+            <label class="sort-control" id="sortControl">
+              Sort
+              <select id="sortSelect">
+                <option value="updated">Recently edited</option>
+                <option value="newest">Newest first</option>
+                <option value="title">Alphabetical</option>
+              </select>
+            </label>
             <label class="check-filter">
               <input id="pinnedFilter" type="checkbox" />
               Pinned only
@@ -249,7 +270,6 @@
             <input type="datetime-local" id="editReminder" aria-label="Note reminder" />
           </div>
         </div>
-        <datalist id="collectionOptions"></datalist>
         <div class="editor-controls">
           <div
             class="swatches"
@@ -278,6 +298,7 @@
         </div>
       </form>
     </dialog>
+    <datalist id="collectionOptions"></datalist>
     <datalist id="fieldNameOptions"></datalist>
     <dialog
       id="accountDialog"
@@ -325,15 +346,17 @@
           It's a section of your note. Give it a name like Questions or Tasks.
           In My notebook, sections with the same name sit in the same column.
           Pick a suggested name if you want to use one again.
-          Show related sections makes the other cards from that same note pulse together.
+          Show related makes every section saved in the same note pulse together.
+          Separate saves stay separate, even if their titles match.
           Click Stop pulse when you're done.
         </p>
       </details>
       <details>
         <summary>What about collections?</summary>
         <p>
-          Think of them as folders. New notes land in Inbox. Open a note and change
-          its collection to keep your classes or projects together.
+          Think of them as folders. Choose a collection while capturing a note,
+          or type a new name. Leave it blank to use Inbox. You can also change it
+          when editing a saved note.
         </p>
       </details>
       <details>
@@ -382,7 +405,18 @@
         <p>
           Yes, in this browser on this device. Drafts save as you type.
           Ctrl + Enter saves a new note. When editing one, click Save changes.
-          Clearing browser data deletes your notes.
+          You'll get a warning before discarding unfinished edits.
+          Clearing browser data deletes your notes. Use Backup to download a copy first.
+        </p>
+      </details>
+      <details>
+        <summary>How do backups work?</summary>
+        <p>
+          Open Backup and click Download backup. The file includes notes, drawings,
+          templates, Recently Deleted, and your unfinished draft.
+          To bring it back, choose that file and click Restore backup.
+          Existing work stays. Different versions return as separate notes;
+          identical items are skipped. A backed-up draft returns as a saved note.
         </p>
       </details>
       <details>
@@ -393,6 +427,30 @@
           browser, and switching back brings your note colors back.
         </p>
       </details>
+    </dialog>
+    <dialog id="backupDialog" aria-labelledby="backupHeading" aria-describedby="backupDescription">
+      <div class="dialog-heading">
+        <h2 id="backupHeading">Backup / restore</h2>
+        <button class="icon-button" id="closeBackup" type="button" aria-label="Close backup">
+          ×
+        </button>
+      </div>
+      <p id="backupDescription">
+        Keep a copy of your notes, drawings, templates, Recently Deleted, and unfinished draft.
+      </p>
+      <button class="primary" id="downloadBackup" type="button">Download backup</button>
+      <div class="restore-section">
+        <label class="form-label">
+          Choose a Noteable backup
+          <input id="backupFile" type="file" accept=".json,application/json" />
+        </label>
+        <p>
+          Restore adds missing items. Different versions return as separate notes.
+          Your current work stays; a backed-up draft returns as a saved note.
+        </p>
+        <button class="secondary" id="restoreBackup" type="button" disabled>Restore backup</button>
+      </div>
+      <p id="backupStatus" role="status" aria-live="polite"></p>
     </dialog>
     <!-- Status messages -->
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

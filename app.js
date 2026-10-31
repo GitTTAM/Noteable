@@ -9,6 +9,7 @@
     notes: 'noteable.notes',
     draft: 'noteable.draft',
     templates: 'noteable.templates',
+    sort: 'noteable.sort',
   };
   const COLORS = [
     ['Black & Yellow', '#ffe600', '#111111', '#171717'],
@@ -67,6 +68,7 @@
   });
   const blankDraft = () => ({
     title: '',
+    category: 'Inbox',
     color: builtins[0].color,
     reminderAt: '',
     templateId: 'cornell',
@@ -143,6 +145,28 @@
       sortPosition: Number.isFinite(raw.sortPosition) ? raw.sortPosition : index,
     };
   }
+  function normalizeDraft(raw) {
+    return {
+      ...blankDraft(),
+      title: typeof raw.title === 'string' ? raw.title.slice(0, 160) : '',
+      category: cleanCollection(raw.category),
+      color: colorValue(raw.color),
+      reminderAt: validDate(raw.reminderAt) ? raw.reminderAt : '',
+      templateId: typeof raw.templateId === 'string' ? raw.templateId : '',
+      layout: noteLayout(raw.layout),
+      fields: normalizeFields(raw.fields),
+    };
+  }
+  function normalizeTemplate(raw) {
+    return {
+      id: raw.id,
+      name: raw.name.slice(0, 60),
+      labels: raw.labels.map((label) => label.slice(0, 60)),
+      color: colorValue(raw.color),
+      layout: noteLayout(raw.layout),
+      slots: raw.labels.map((_, index) => fieldSlot(raw.slots?.[index])),
+    };
+  }
 
   // Restore notes and the unfinished draft
   const saved = read(KEYS.notes, []);
@@ -154,16 +178,7 @@
   let draft = blankDraft();
   const storedDraft = read(KEYS.draft, null);
   if (storedDraft && typeof storedDraft === 'object') {
-    draft = {
-      ...draft,
-      title: typeof storedDraft.title === 'string' ? storedDraft.title : '',
-      color: colorValue(storedDraft.color),
-      reminderAt: validDate(storedDraft.reminderAt) ? storedDraft.reminderAt : '',
-      templateId:
-        typeof storedDraft.templateId === 'string' ? storedDraft.templateId : '',
-      layout: noteLayout(storedDraft.layout),
-      fields: normalizeFields(storedDraft.fields),
-    };
+    draft = normalizeDraft(storedDraft);
   }
 
   // Built-in and saved templates
@@ -176,11 +191,15 @@
           typeof t.name === 'string' &&
           Array.isArray(t.labels) &&
           t.labels.every((l) => typeof l === 'string'),
-      )
+      ).map(normalizeTemplate)
     : [];
 
   // Current view and editor state
   let editor = null;
+  let editorSnapshot = null;
+  let pendingBackup = null;
+  const storedSort = read(KEYS.sort, 'updated');
+  let sortOrder = ['updated', 'newest', 'title'].includes(storedSort) ? storedSort : 'updated';
   let view = 'capture';
   let relatedNoteId = null;
   let toastTimer;
@@ -288,6 +307,7 @@
   }
   function renderCapture() {
     $('draftTitle').value = draft.title;
+    $('draftCollection').value = draft.category;
     $('draftReminder').value = localDate(draft.reminderAt);
     $('draftReminder').dispatchEvent(new Event('picker-sync'));
     $('captureOptions').hidden = !draft.reminderAt;
@@ -504,7 +524,7 @@
       layout: draft.layout,
       fields: copy(draft.fields),
       id: makeId(),
-      category: 'Inbox',
+      category: cleanCollection(draft.category),
       pinned: false,
       createdAt: now,
       updatedAt: now,
@@ -640,6 +660,7 @@
     $('collectionFilter').hidden = next === 'trash';
     document.querySelector('label[for="collectionFilter"]').hidden = next === 'trash';
     $('pinnedFilter').closest('label').hidden = next === 'trash';
+    $('sortControl').hidden = next === 'trash';
     renderNavigation();
     renderRecent();
     if (!capture) renderBoard();
@@ -668,7 +689,13 @@
           .includes(query),
     );
     matches.sort(
-      (a, b) => Number(b.pinned) - Number(a.pinned) || a.sortPosition - b.sortPosition,
+      (a, b) =>
+        Number(b.pinned) - Number(a.pinned) ||
+        (sortOrder === 'title'
+          ? titleOf(a).localeCompare(titleOf(b), undefined, { sensitivity: 'base', numeric: true })
+          : Date.parse(sortOrder === 'newest' ? b.createdAt : b.updatedAt) -
+            Date.parse(sortOrder === 'newest' ? a.createdAt : a.updatedAt)) ||
+        a.sortPosition - b.sortPosition,
     );
     const columns = new Map();
     matches.forEach((note) =>
@@ -704,10 +731,15 @@
     card.dataset.noteId = note.id;
     paintNote(card, note.color);
     const meta = node('div', 'card-meta');
-    meta.append(
-      node('span', '', note.category),
-      node('span', '', note.pinned ? '◆ Pinned' : dateLabel(note.updatedAt)),
+    const actions = node('div', 'card-actions');
+    const pin = button(note.pinned ? 'Unpin' : 'Pin', '', () =>
+      updateNote(note.id, (n) => {
+        n.pinned = !n.pinned;
+      }),
     );
+    pin.setAttribute('aria-pressed', String(note.pinned));
+    actions.append(pin, button('Edit ↗', '', () => openEditor(note.id)));
+    meta.append(node('span', 'card-category', note.category), actions);
     const open = button('', 'card-open', () => openEditor(note.id));
     open.setAttribute(
       'aria-label',
@@ -745,7 +777,7 @@
     }
     const footer = node('div', 'card-footer');
     if (note.fields.length > 1) {
-      const related = button('Show related sections', 'related-button', () => {
+      const related = button('Show related', 'related-button', () => {
         relatedNoteId = relatedNoteId === note.id ? null : note.id;
         renderRelatedCards();
       });
@@ -753,16 +785,23 @@
       related.setAttribute('aria-controls', 'reviewBoard');
       footer.append(related);
     }
-    const actions = node('div', 'card-actions');
-    actions.append(
-      button(note.pinned ? 'Unpin' : 'Pin', '', () =>
-        updateNote(note.id, (n) => {
-          n.pinned = !n.pinned;
-        }),
-      ),
-      button('Edit ↗', '', () => openEditor(note.id)),
-    );
-    footer.append(actions);
+    const remove = button('', 'card-delete', () => requestDeleteNote(note.id));
+    remove.setAttribute('aria-label', `Delete ${titleOf(note)} and all its sections`);
+    remove.title = 'Delete note and all its sections';
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('fill', 'none');
+    icon.setAttribute('stroke', 'currentColor');
+    icon.setAttribute('stroke-width', '1.7');
+    icon.setAttribute('stroke-linecap', 'round');
+    icon.setAttribute('stroke-linejoin', 'round');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.setAttribute('focusable', 'false');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7');
+    icon.append(path);
+    remove.append(icon);
+    footer.append(remove);
     card.append(footer);
     return card;
   }
@@ -782,7 +821,7 @@
       card.classList.toggle('related-card', related);
       const control = card.querySelector('.related-button');
       if (control) {
-        control.textContent = related ? 'Stop pulse' : 'Show related sections';
+        control.textContent = related ? 'Stop pulse' : 'Show related';
         control.setAttribute('aria-pressed', String(related));
       }
     });
@@ -803,6 +842,10 @@
   }
 
   // Deleted notes stay in the same storage record for safe recovery.
+  function requestDeleteNote(id) {
+    if (!confirm('Move this note and all its sections to Recently Deleted? You can restore it there.')) return;
+    moveToTrash(id);
+  }
   function moveToTrash(id) {
     const note = notes.find((candidate) => candidate.id === id);
     if (!note) return;
@@ -897,20 +940,182 @@
     renderFields($('editFields'), editor, () => {});
     $('editorMeta').textContent =
       `Captured ${reminderLabel(editor.createdAt)} · Changes save when you choose Save changes.`;
+    editorSnapshot = JSON.stringify(editorValues());
     $('noteDialog').showModal();
     $('editTitle').focus();
   }
   function editorValues() {
-    editor.title = $('editTitle').value.trim();
-    editor.category = cleanCollection($('editCollection').value);
-    editor.pinned = $('editPinned').checked;
-    const reminder = fromInputDate($('editReminder').value);
-    if (reminder !== editor.reminderAt) editor.reminderDismissed = false;
-    editor.reminderAt = reminder;
-    editor.fields.forEach((f) => {
+    const value = copy(editor);
+    value.title = $('editTitle').value.trim();
+    value.category = cleanCollection($('editCollection').value);
+    value.pinned = $('editPinned').checked;
+    const reminder = $('editReminder').value === localDate(editor.reminderAt)
+      ? editor.reminderAt
+      : fromInputDate($('editReminder').value);
+    if (reminder !== editor.reminderAt) value.reminderDismissed = false;
+    value.reminderAt = reminder;
+    value.fields.forEach((f) => {
       f.label = f.label.trim() || 'Notes';
     });
-    return editor;
+    return value;
+  }
+  function editorIsDirty() {
+    return editor && $('noteDialog').open &&
+      JSON.stringify(editorValues()) !== editorSnapshot;
+  }
+  function requestCloseEditor() {
+    if (editorIsDirty() && !confirm('Discard unsaved changes to this note?')) return;
+    $('noteDialog').close();
+  }
+
+  // Portable backups. Restore merges versions instead of overwriting current work.
+  function downloadBackup() {
+    const backup = {
+      format: 'noteable-backup',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      notes: [...notes, ...trash],
+      templates,
+      draft: normalizeDraft(draft),
+    };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], {
+      type: 'application/json',
+    }));
+    const link = node('a');
+    link.href = url;
+    link.download = `noteable-backup-${backup.exportedAt.slice(0, 10)}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    $('backupStatus').textContent = 'Backup downloaded. Keep the file somewhere you can find it.';
+  }
+  function parseBackup(raw) {
+    const data = JSON.parse(raw);
+    const object = (value) => value && typeof value === 'object' && !Array.isArray(value);
+    const text = (value, max) => typeof value === 'string' && value.length <= max;
+    const date = (value) => value === '' || validDate(value);
+    const slot = (value) => value === undefined || value === '' || fieldSlot(value) === value;
+    const fields = (value) => Array.isArray(value) && value.length > 0 && value.every((field) =>
+      object(field) && text(field.label, 60) && typeof field.text === 'string' &&
+      ['text', 'draw'].includes(field.mode) && slot(field.slot) &&
+      Array.isArray(field.strokes) && field.strokes.every((stroke) =>
+        Array.isArray(stroke) && stroke.every((point) => Array.isArray(point) &&
+          point.length === 2 && point.every((n) => Number.isFinite(n) && n >= 0 && n <= 1))),
+    );
+    const model = (value) => object(value) && text(value.title, 160) &&
+      COLORS.some((choice) => choice[1] === value.color) &&
+      ['cornell', 'stacked'].includes(value.layout) && fields(value.fields) &&
+      date(value.reminderAt);
+    const note = (value) => model(value) && typeof value.id === 'string' && value.id &&
+      text(value.category, 40) && typeof value.pinned === 'boolean' &&
+      validDate(value.createdAt) && validDate(value.updatedAt) && date(value.deletedAt) &&
+      typeof value.reminderDismissed === 'boolean' && Number.isFinite(value.sortPosition);
+    const template = (value) => object(value) && typeof value.id === 'string' && value.id &&
+      text(value.name, 60) && value.name.trim() && Array.isArray(value.labels) &&
+      value.labels.length > 0 && value.labels.every((label) => text(label, 60)) &&
+      COLORS.some((choice) => choice[1] === value.color) &&
+      ['cornell', 'stacked'].includes(value.layout) &&
+      (value.slots === undefined || (Array.isArray(value.slots) &&
+        value.slots.length === value.labels.length && value.slots.every(slot)));
+    if (!object(data) || data.format !== 'noteable-backup')
+      throw new Error('Choose a Noteable backup file.');
+    if (data.version !== 1)
+      throw new Error('This backup version is not supported by this copy of Noteable.');
+    if (!validDate(data.exportedAt) || !Array.isArray(data.notes) ||
+      !data.notes.every(note) || !Array.isArray(data.templates) ||
+      !data.templates.every(template) ||
+      (data.draft != null && (!model(data.draft) || !text(data.draft.category, 40))))
+      throw new Error('This backup has invalid or incomplete data. Nothing was restored.');
+    return data;
+  }
+  const noteSignature = (note) => {
+    const { id, sortPosition, ...contents } = normalizeNote(note, 0);
+    return JSON.stringify(contents);
+  };
+  const templateSignature = (template) => {
+    const { id, ...contents } = normalizeTemplate(template);
+    return JSON.stringify(contents);
+  };
+  function storeRestoredData(nextNotes, nextTemplates) {
+    const written = [];
+    try {
+      for (const [key, value] of [[KEYS.notes, nextNotes], [KEYS.templates, nextTemplates]]) {
+        const previous = localStorage.getItem(key);
+        localStorage.setItem(key, JSON.stringify(value));
+        written.push([key, previous]);
+      }
+      return true;
+    } catch {
+      // If the second write fails, put the first record back before reporting failure.
+      for (const [key, previous] of written.reverse()) {
+        try {
+          if (previous === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, previous);
+        } catch {
+          // Restore only adds data, so existing work survives even if rollback is blocked.
+        }
+      }
+      $('backupStatus').textContent =
+        'Restore could not finish. Current work was kept. Free some browser storage and try again.';
+      return false;
+    }
+  }
+  function restoreBackup() {
+    if (!pendingBackup) return;
+    const data = pendingBackup;
+    const merged = [...notes, ...trash];
+    const signatures = new Set(merged.map(noteSignature));
+    const ids = new Set(merged.map((note) => note.id));
+    let position = Math.max(-1, ...merged.map((note) => note.sortPosition)) + 1;
+    const incoming = data.notes.map(normalizeNote);
+    if (data.draft && (hasContent(data.draft) || data.draft.title.trim())) {
+      incoming.push(normalizeNote({
+        ...data.draft,
+        id: makeId(),
+        title: data.draft.title.trim() || 'Restored draft',
+        createdAt: data.exportedAt,
+        updatedAt: data.exportedAt,
+      }, position));
+    }
+    let addedNotes = 0;
+    for (const note of incoming) {
+      const signature = noteSignature(note);
+      if (signatures.has(signature)) continue;
+      if (ids.has(note.id)) note.id = makeId();
+      note.sortPosition = position++;
+      ids.add(note.id);
+      signatures.add(signature);
+      merged.push(note);
+      addedNotes++;
+    }
+    const nextTemplates = templates.slice();
+    const templateSignatures = new Set(templates.map(templateSignature));
+    const templateIds = new Set([...builtins, ...templates].map((template) => template.id));
+    for (const raw of data.templates) {
+      const template = normalizeTemplate(raw);
+      const signature = templateSignature(template);
+      if (templateSignatures.has(signature)) continue;
+      if (templateIds.has(template.id)) template.id = makeId();
+      templateIds.add(template.id);
+      templateSignatures.add(signature);
+      nextTemplates.push(template);
+    }
+    const addedTemplates = nextTemplates.length - templates.length;
+    if ((addedNotes || addedTemplates) && !storeRestoredData(merged, nextTemplates)) return;
+    notes = merged.filter((note) => !note.deletedAt);
+    trash = merged.filter((note) => note.deletedAt);
+    templates = nextTemplates;
+    renderTemplates();
+    renderNavigation();
+    renderRecent();
+    if (view !== 'capture') renderBoard();
+    $('backupStatus').textContent = addedNotes || addedTemplates
+      ? `Restored ${addedNotes} ${addedNotes === 1 ? 'note' : 'notes'} and ${addedTemplates} ${addedTemplates === 1 ? 'template' : 'templates'}. Current work kept.`
+      : 'Everything in this backup is already here. Nothing changed.';
+    pendingBackup = null;
+    $('restoreBackup').disabled = true;
+    $('backupFile').value = '';
   }
 
   // Template menu and reminder checks
@@ -955,6 +1160,40 @@
   });
   $('helpButton').addEventListener('click', () => $('helpDialog').showModal());
   $('closeHelp').addEventListener('click', () => $('helpDialog').close());
+  $('backupButton').addEventListener('click', () => $('backupDialog').showModal());
+  $('closeBackup').addEventListener('click', () => $('backupDialog').close());
+  $('backupDialog').addEventListener('close', () => {
+    pendingBackup = null;
+    $('backupFile').value = '';
+    $('restoreBackup').disabled = true;
+    $('backupStatus').textContent = '';
+  });
+  $('downloadBackup').addEventListener('click', downloadBackup);
+  $('restoreBackup').addEventListener('click', restoreBackup);
+  $('backupFile').addEventListener('change', async () => {
+    pendingBackup = null;
+    $('restoreBackup').disabled = true;
+    const file = $('backupFile').files[0];
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) {
+      $('backupStatus').textContent = 'Choose a backup smaller than 20 MB.';
+      return;
+    }
+    $('backupStatus').textContent = 'Reading backup…';
+    try {
+      const raw = await file.text();
+      if ($('backupFile').files[0] !== file) return;
+      pendingBackup = parseBackup(raw);
+      $('backupStatus').textContent =
+        `Ready: ${pendingBackup.notes.length} saved notes, ${pendingBackup.templates.length} templates. Click Restore backup to add them.`;
+      $('restoreBackup').disabled = false;
+    } catch (error) {
+      if ($('backupFile').files[0] !== file) return;
+      $('backupStatus').textContent = error instanceof SyntaxError
+        ? 'This file is not valid JSON. Choose a Noteable backup. Nothing was restored.'
+        : error.message || 'Could not read this file. Nothing was restored.';
+    }
+  });
 
   // Account forms are a demo. Nothing is sent or saved.
   function showAccount(mode) {
@@ -990,6 +1229,10 @@
   });
   $('draftTitle').addEventListener('input', () => {
     draft.title = $('draftTitle').value;
+    persistDraft();
+  });
+  $('draftCollection').addEventListener('input', () => {
+    draft.category = $('draftCollection').value;
     persistDraft();
   });
   $('draftReminder').addEventListener('change', () => {
@@ -1033,9 +1276,25 @@
   ['searchInput', 'collectionFilter', 'pinnedFilter'].forEach((id) =>
     $(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderBoard),
   );
-  $('closeEditor').addEventListener('click', () => $('noteDialog').close());
+  $('sortSelect').value = sortOrder;
+  $('sortSelect').addEventListener('change', () => {
+    sortOrder = $('sortSelect').value;
+    write(KEYS.sort, sortOrder);
+    renderBoard();
+  });
+  $('closeEditor').addEventListener('click', requestCloseEditor);
+  $('noteDialog').addEventListener('cancel', (event) => {
+    event.preventDefault();
+    requestCloseEditor();
+  });
   $('noteDialog').addEventListener('close', () => {
     editor = null;
+    editorSnapshot = null;
+  });
+  window.addEventListener('beforeunload', (event) => {
+    if (!editorIsDirty()) return;
+    event.preventDefault();
+    event.returnValue = '';
   });
   $('editorForm').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -1056,8 +1315,7 @@
     checkReminders();
   });
   $('deleteNote').addEventListener('click', () => {
-    if (!confirm('Move this note to Recently Deleted? You can restore it there.')) return;
-    moveToTrash(editor.id);
+    requestDeleteNote(editor.id);
   });
   $('saveTemplate').addEventListener('click', () => {
     const name = prompt(

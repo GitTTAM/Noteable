@@ -16,6 +16,7 @@ textarea:focus {
 
 .capture-pad .paper-label,
 .capture-pad .field-guide,
+.capture-pad .capture-collection,
 .field-name-label,
 .drawing-help,
 .capture-pad .text-button,
@@ -55,7 +56,7 @@ textarea:focus {
 .field-guide {
   margin: 0 0 18px;
   color: #514631;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -224,7 +225,56 @@ textarea:focus {
   flex-shrink: 0;
 }
 
+.capture-collection {
+  max-width: 320px;
+  color: var(--note-ink, #292a31);
+  font-size: 12px;
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+/* Backups stay available in every view. */
+#backupDialog {
+  max-width: 600px;
+}
+
+#backupDialog p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.restore-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ui-line);
+}
+
+#backupFile {
+  width: 100%;
+  max-width: 100%;
+  padding: 8px;
+}
+
+#backupStatus {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
+
 /* Show which cards belong to the same saved note */
+.card-meta {
+  align-items: center;
+}
+
+.card-category {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .card-footer {
   display: flex;
   align-items: center;
@@ -236,8 +286,38 @@ textarea:focus {
 
 .card-actions {
   display: flex;
-  gap: 12px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
   margin-left: auto;
+}
+
+.card-actions button {
+  min-height: 32px;
+  padding: 0 2px;
+  background: transparent;
+  color: inherit;
+  font-size: 10px;
+}
+
+.board-card .card-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-height: 36px;
+  margin-left: auto;
+  border-radius: 2px;
+}
+
+.card-delete svg {
+  width: 18px;
+  height: 18px;
+}
+
+.card-actions button:hover,
+.card-delete:hover {
+  background: #00000014;
 }
 
 .board-card .related-button {
@@ -469,7 +549,38 @@ textarea:focus {
   }
 
   .capture-actions {
-    flex-wrap: wrap;
+    position: fixed;
+    z-index: 8;
+    inset: auto 0 0;
+    margin: 0;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    gap: 12px;
+    background: var(--ui-surface);
+    border-top: 1px solid var(--ui-line);
+  }
+
+  .capture-actions .draft-status {
+    flex: 1;
+    min-width: 0;
+  }
+
+  main {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  }
+
+  body:has(#captureView:not([hidden])) .toast {
+    bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+
+  #noteDialog .dialog-actions {
+    position: sticky;
+    bottom: -22px;
+    z-index: 2;
+    margin-right: -18px;
+    margin-left: -18px;
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+    background: var(--ui-surface);
+    border-top: 1px solid var(--ui-line);
   }
 
   .save-action {
@@ -488,5 +599,11 @@ textarea:focus {
 
   .review-board.trash-board {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card-actions button,
+  .board-card .card-delete {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

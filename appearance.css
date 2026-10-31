@@ -350,7 +350,7 @@ dialog .text-button,
 /* Grayscale changes the display without rewriting any note colors. */
 /* Filter individual surfaces so fixed controls keep their viewport position. */
 html[data-appearance='grayscale'] :is(
-  .sidebar, .topbar, main, .preview-header, dialog, .toast, .reminder-popup
+  .sidebar, .topbar, .preview-header, dialog, .toast, .reminder-popup
 ) {
   filter: grayscale(1);
 }
